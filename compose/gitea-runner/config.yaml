@@ -21,6 +21,9 @@ container:
   # Only these host paths may be mounted into job containers.
   valid_volumes:
     - /var/run/docker.sock
-  # Extra "docker run" options for every job container: lets a job build images
-  # through the laptop's Docker daemon.
-  options: "-v /var/run/docker.sock:/var/run/docker.sock"
+    - mlops-uv-cache
+  # Extra "docker run" options for every job container. The runner already gives the job the
+  # laptop's Docker socket (so a job can build images), so only the cache volume is added:
+  # `mlops-uv-cache` keeps the downloaded Python wheels between jobs (a CI run drops from
+  # about 40 s of downloads to about 1 s, and it still works if the internet is slow).
+  options: "-v mlops-uv-cache:/root/.cache/uv"

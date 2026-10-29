@@ -1,0 +1,46 @@
+# Pipeline definition: DVC builds the graph of stages from this file (preprocess -> train ->
+# evaluate). Every stage has a command, inputs (deps and params) and outputs (outs).
+# `dvc repro` runs only the stages whose inputs changed compared with `dvc.lock`.
+stages:
+  # Stage 1: split the raw data into train and test.
+  preprocess:
+    # The command DVC runs (it reads `params.yaml` by default).
+    cmd: uv run python -m churn.preprocess
+    # deps: files that make this stage run again when their content (hash) changes.
+    deps:
+      - data/raw/churn.csv
+      - src/churn/preprocess.py
+    # params: track only these keys of params.yaml; changing C does not rerun this stage.
+    params:
+      - data.test_size
+      - data.seed
+    # outs: outputs that DVC caches and keeps out of git (they go into .gitignore).
+    outs:
+      - data/processed
+  # Stage 2: train the model on train.csv. The train.csv output of the previous stage is the
+  # input of this one, so DVC works out the run order by itself.
+  train:
+    cmd: uv run python -m churn.train
+    deps:
+      - data/processed/train.csv
+      - src/churn/train.py
+    # A section name without a key means track the whole train section (both C and max_iter).
+    params:
+      - train
+    outs:
+      - models/model.joblib
+  # Stage 3: evaluate the model on test.csv and write metrics.json.
+  evaluate:
+    cmd: uv run python -m churn.evaluate
+    deps:
+      - data/processed/test.csv
+      - models/model.joblib
+      - src/churn/evaluate.py
+    params:
+      - eval.threshold
+    # metrics: the file of evaluation numbers; see it with `dvc metrics show` / `dvc metrics diff`.
+    metrics:
+      # cache: false means DVC does not cache metrics.json and it stays directly in git (it is
+      # a small text file and we want to see its diff in git).
+      - metrics.json:
+          cache: false

@@ -128,7 +128,7 @@ healthcheck:
 build:
   context: ./mlflow
   args:
-    MLFLOW_VERSION: "3.16.0"
+    MLFLOW_VERSION: "3.17.2"
     BOTO3_VERSION: "1.43.95"
 depends_on:
   seaweedfs:
@@ -172,7 +172,7 @@ command: >
 
 ```dockerfile
 FROM ${PYTHON_BASE_IMAGE}
-ARG MLFLOW_VERSION=3.16.0
+ARG MLFLOW_VERSION=3.17.2
 ARG BOTO3_VERSION=1.43.95
 RUN pip install --no-cache-dir "mlflow==${MLFLOW_VERSION}" "boto3==${BOTO3_VERSION}" \
  && useradd --uid 1000 --create-home mlflow && mkdir /mlflow && chown mlflow /mlflow
@@ -246,12 +246,17 @@ container:
   network: mlops-lab
   force_pull: false
   privileged: false
+  valid_volumes:
+    - /var/run/docker.sock
+    - mlops-uv-cache
+  options: "-v mlops-uv-cache:/root/.cache/uv"
 ```
 
 - مقدار `capacity: 1` یعنی هر بار فقط یک job اجرا می‌شود تا لپ‌تاپ ۱۶ گیگ تحت فشار نباشد.
 - مقدار `timeout: 30m` jobهای طولانی‌تر از ۳۰ دقیقه را متوقف می‌کند.
 - برچسب `ubuntu-latest` به image آماده‌ی دوره (`mlops/ci-job:1.0`) وصل شده است، یعنی jobهایی که `runs-on: ubuntu-latest` دارند داخل آن اجرا می‌شوند.
 - مقدار `network: mlops-lab` باعث می‌شود containerهای job با نام‌های `gitea`، `mlflow` و `seaweedfs` سرویس‌ها را ببینند.
+- گزینه‌ی `options` یک volume به نام `mlops-uv-cache` به هر job وصل می‌کند و `valid_volumes` اجازه‌ی این کار را می‌دهد. کتابخانه‌های Python که `uv` دانلود می‌کند آنجا می‌مانند، پس اجرای دوم CI به‌جای ۲۰ تا ۵۰ ثانیه دانلود، حدود یک ثانیه صرف نصب می‌کند (اندازه‌گیری ما: volume حدود ۸۰۰ مگابایت). سوکت Docker را خود runner به job می‌دهد؛ آن را دوباره در `options` ننویسید، وگرنه job با خطای `Duplicate mount point` شروع نمی‌شود.
 - مقدار `force_pull: false` یعنی image محلی استفاده شود و اینترنت لازم نباشد. مقدار `privileged: false` هم دسترسی اضافه به jobها نمی‌دهد.
 
 ## volumeها و شبکه

@@ -1,0 +1,17 @@
+# Settings for the baseline model (Session 1). The code reads them, so we change numbers
+# here instead of editing Python.
+data:
+  # where the generated CSV lives
+  raw_path: data/raw/churn.csv
+  # 20% of the rows are kept for testing
+  test_size: 0.2
+  # fixed random seed: the same split every run
+  seed: 42
+train:
+  # inverse regularization strength: smaller C = simpler, more careful model
+  C: 1.0
+  # max optimizer steps; too few gives a ConvergenceWarning
+  max_iter: 500
+eval:
+  # a churn probability above this value counts as "customer will leave"
+  threshold: 0.5

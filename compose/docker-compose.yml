@@ -57,13 +57,13 @@ services:
 
   # ---- MLflow tracking server + model registry (used in sessions 6-8) --------------------
   mlflow:
-    image: ${MLFLOW_SERVER_IMAGE:-mlops/mlflow-server:3.16.0}
+    image: ${MLFLOW_SERVER_IMAGE:-mlops/mlflow-server:3.17.2}
     # Built locally from ./mlflow/Dockerfile (see that file), so no external image is needed.
     build:
       context: ./mlflow
       args:
         # must match mlflow in requirements.txt
-        MLFLOW_VERSION: "3.16.0"
+        MLFLOW_VERSION: "3.17.2"
         # S3 client library used for the artifact store
         BOTO3_VERSION: "1.43.95"
     container_name: mlflow
