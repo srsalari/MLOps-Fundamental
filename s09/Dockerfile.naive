@@ -1,0 +1,6 @@
+# First try: works, but big, runs as root and copies everything (even .env).
+FROM python:3.12-slim-bookworm
+WORKDIR /app
+COPY . .
+RUN pip install uv==0.12.15 && uv sync --frozen
+CMD ["uv", "run", "uvicorn", "churn.api:app", "--host", "0.0.0.0", "--port", "8000"]

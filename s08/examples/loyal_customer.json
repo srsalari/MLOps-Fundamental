@@ -1,0 +1,8 @@
+{
+  "tenure_months": 60,
+  "monthly_charges": 40,
+  "contract": "two-year",
+  "internet_service": "dsl",
+  "payment_method": "bank_transfer",
+  "support_calls": 0
+}

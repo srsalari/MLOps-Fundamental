@@ -1,0 +1,8 @@
+{
+  "tenure_months": 3,
+  "monthly_charges": 95.5,
+  "contract": "weekly",
+  "internet_service": "fiber",
+  "payment_method": "card",
+  "support_calls": 1.5
+}
