@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # تکلیف جلسه‌ی ۵
 
 مهلت: پیش از شروع جلسه‌ی ۶. همه‌ی کارها روی یک شاخه‌ی تازه و با یک Pull Request وارد `main` شوند.
@@ -10,8 +12,8 @@ cd ~/work/churn-mlops && git switch main && git pull && git switch -c feature/ho
 
 یکی از سه گزینه را انتخاب کنید (یا پارامتر دلخواه خودتان را، با تأیید مدرس):
 
-- **`train.class_weight`:** مقدار `balanced` یا `null` برای `LogisticRegression`. این پارامتر باید به `build_model` برسد.
-- **`train.solver`:** الگوریتم بهینه‌سازی `LogisticRegression` (مثلاً `lbfgs` یا `liblinear`).
+- <bdi dir="rtl">**`train.class_weight`:** مقدار `balanced` یا `null` برای `LogisticRegression`. این پارامتر باید به `build_model` برسد.</bdi>
+- <bdi dir="rtl">**`train.solver`:** الگوریتم بهینه‌سازی `LogisticRegression` (مثلاً `lbfgs` یا `liblinear`).</bdi>
 - **یک پارامتر پیش‌پردازش در بخش `data`:** مثلاً `data.drop_columns` (فهرست ستون‌هایی که از ویژگی‌ها حذف می‌شود) یا گرد کردن `monthly_charges`، در `preprocess.py`.
 
 شرط‌ها:
@@ -42,10 +44,10 @@ uv run dvc exp show --no-pager --only-changed --md --drop '^data/|^models/|^src/
 بخشی به نام `Experiments` به `README.md` پروژه اضافه کنید با یک جدول کوتاه، یک ردیف برای هر مقدار (شامل مقدار پایه) و چند جمله:
 
 | پارامتر و مقدار | مرحله‌هایی که دوباره اجرا شدند | roc_auc | f1 |
-|---|---|---|---|
-| (مقدار پایه) | — | | |
-| | | | |
-| | | | |
+| --- | --- | --- | --- |
+| (مقدار پایه) | — |  |  |
+|  |  |  |  |
+|  |  |  |  |
 
 زیر جدول در دو یا سه جمله بنویسید: کدام مقدار را نگه داشتید و چرا. به این فکر کنید که کدام متریک به این پارامتر حساس بود و آیا مقایسه‌ی عددها منصفانه است (داده‌ی test عوض نشده باشد).
 
@@ -82,3 +84,5 @@ git switch main && git pull && uv run dvc checkout
 ## برای جلسه‌ی ۶
 
 پروژه را سالم و روی `main` نگه دارید؛ جلسه‌ی بعد از همین پایپ‌لاین ادامه می‌دهد.
+
+</div>

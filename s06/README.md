@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # آزمایشگاه جلسه‌ی ۶ — MLflow Tracking و اتصال آن به پروژه
 
 در این آزمایشگاه سرور MLflow را با Compose بالا می‌آورید (متادیتا در SQLite، artifactها روی SeaweedFS)، مرحله‌ی `evaluate` پایپ‌لاین DVC را طوری تغییر می‌دهید که هر اجرا را در MLflow ثبت کند، چند آزمایش `dvc exp run` اجرا می‌کنید و نتیجه‌ها را در UI مقایسه می‌کنید.
@@ -36,7 +38,7 @@ uv run dvc status
 ## مفهوم‌ها در یک نگاه
 
 | واژه | معنی در MLflow |
-|---|---|
+| --- | --- |
 | experiment | گروهی از اجراها؛ ما یکی داریم با نام `churn` |
 | run | یک اجرا؛ هر بار که `evaluate` اجرا شود یک run ثبت می‌شود |
 | param | ورودی اجرا (مثل `train.C`)، یک‌بار ثبت می‌شود |
@@ -47,7 +49,7 @@ uv run dvc status
 معماری سرور در این آزمایشگاه:
 
 | بخش | کجاست |
-|---|---|
+| --- | --- |
 | backend store (param، metric، tag) | فایل SQLite داخل volume کانتینر `mlflow` |
 | artifact store (فایل‌ها) | سطل `s3://mlflow` روی SeaweedFS |
 | دسترسی کلاینت به artifact | از راه خود سرور (`--serve-artifacts`)؛ کلاینت روی لپ‌تاپ کلید S3 نمی‌خواهد |
@@ -56,13 +58,13 @@ uv run dvc status
 
 - سرور MLflow روی `http://localhost:5050` با experiment به نام `churn`
 - چهار run (یکی از `dvc repro` و سه تا از `dvc exp run`) با param، metric، tag، `metrics.json` و مدل
-- artifactها روی `s3://mlflow` در SeaweedFS
+- <bdi dir="rtl">artifactها روی `s3://mlflow` در SeaweedFS</bdi>
 - کد در Git با tag نسخه‌ی `v0.4.0`
 
 ## فایل‌های این پوشه
 
 | فایل | مقصد در پروژه | کار |
-|---|---|---|
+| --- | --- | --- |
 | `churn/evaluate.py` | `src/churn/` | همان مرحله‌ی `evaluate` به‌علاوه‌ی ثبت run در MLflow (جای فایل قبلی) |
 | `scripts/list_runs.py` | `scripts/` | چاپ جدول run‌ها در ترمینال |
 | `tests/test_tracking.py` | `tests/` | سه آزمون برای ثبت run (بدون نیاز به سرور) |
@@ -109,7 +111,7 @@ EOF
 ```
 
 | متغیر | کار |
-|---|---|
+| --- | --- |
 | `MLFLOW_TRACKING_URI` | نشانی سرور؛ کد ما اگر این متغیر نباشد همین مقدار را پیش‌فرض می‌گیرد |
 | `MLFLOW_DISABLE_AGENT_HINT` | خط راهنمای اضافه‌ی MLflow 3.16 را هنگام import خاموش می‌کند |
 | `MLFLOW_ENABLE_PROXY_MULTIPART_DOWNLOAD` | دانلود artifact از راه سرور؛ بدون آن `load_model` از روی لپ‌تاپ آویزان می‌شود (عیب‌یابی را ببینید) |
@@ -136,7 +138,7 @@ uv run aws --endpoint-url "$S3_ENDPOINT_URL" s3 mb s3://mlflow
 
 ## گام ۲ — اتصال کد به MLflow (۱۰ دقیقه)
 
-MLflow را با نسخه‌ی دقیق به پروژه اضافه کنید:
+<bdi dir="rtl">MLflow را با نسخه‌ی دقیق به پروژه اضافه کنید:</bdi>
 
 ```bash
 uv add mlflow==3.17.2
@@ -161,7 +163,7 @@ printf 'mlflow.db\nmlruns/\n' >> .gitignore
 حالا `src/churn/evaluate.py` را بخوانید. تابع‌ها این‌اند:
 
 | تابع | کار |
-|---|---|
+| --- | --- |
 | `score` | بدون تغییر نسبت به جلسه‌ی ۵ |
 | `flatten` | `params.yaml` تودرتو را به کلیدهای `train.C`، `eval.threshold`، … تبدیل می‌کند |
 | `data_md5` | md5 داده‌ی خام را از فایل `data/raw/churn.csv.dvc` می‌خواند |
@@ -171,7 +173,7 @@ printf 'mlflow.db\nmlruns/\n' >> .gitignore
 آنچه در هر run ثبت می‌شود:
 
 | نوع | مقدار |
-|---|---|
+| --- | --- |
 | params | همه‌ی `params.yaml` (`data.test_size`، `train.C`، `eval.threshold`، …) |
 | metrics | `roc_auc` و `f1` |
 | tags | `data_md5` (نسخه‌ی داده)؛ commit و شاخه‌ی Git را خود MLflow به‌صورت `mlflow.source.git.*` ثبت می‌کند |
@@ -181,7 +183,7 @@ printf 'mlflow.db\nmlruns/\n' >> .gitignore
 دو تصمیم طراحی:
 
 - **سرور اجباری است.** اگر `evaluate` بی‌سرور بی‌صدا رد می‌شد، `dvc repro` موفق به نظر می‌رسید ولی run گم می‌شد. پس `check_server` با خطای روشن متوقف می‌کند. برای آزمون‌ها سرور لازم نیست: آن‌ها `MLFLOW_TRACKING_URI` را روی یک فایل SQLite موقت می‌گذارند.
-- **`mlflow` فقط در `evaluate.py` است** و `dvc.yaml` عوض نمی‌شود. فایل `evaluate.py` از قبل وابستگی مرحله‌ی `evaluate` است.
+- <bdi dir="rtl">**`mlflow` فقط در `evaluate.py` است** و `dvc.yaml` عوض نمی‌شود. فایل `evaluate.py` از قبل وابستگی مرحله‌ی `evaluate` است.</bdi>
 
 ```bash
 uv run ruff check . && uv run ruff format --check .
@@ -207,7 +209,7 @@ evaluate:
 		modified:           src/churn/evaluate.py
 ```
 
-DVC می‌داند فقط `evaluate` عوض شده. `preprocess` و `train` دوباره اجرا نمی‌شوند:
+<bdi dir="rtl">DVC می‌داند فقط `evaluate` عوض شده. `preprocess` و `train` دوباره اجرا نمی‌شوند:</bdi>
 
 ```bash
 uv run dvc repro
@@ -244,11 +246,11 @@ make runs
 
 در `http://localhost:5050`، حالت **Model training**، experiment `churn`، روی نام run کلیک کنید:
 
-- **Overview:** بخش Metrics با `roc_auc` و `f1`؛ بخش Parameters با شش param؛ Tags با `data_md5`؛ بخش Source با نام شاخه و commit. چون کد را هنوز commit نکرده‌اید، commit همان `2834c33` (یا commit آخر شما در `main`) است، یعنی پیش از این تغییر.
-- **Artifacts:** دو فایل `metrics.json` و `params.yaml`.
-- **Logged models:** یک مدل به نام `model` با وضعیت Ready. در MLflow 3 مدل هم‌رده‌ی run است و در پوشه‌ی خودش ذخیره می‌شود، نه زیر `artifacts` همان run. روی مدل کلیک کنید: `MLmodel`، `signature` و `input_example` را ببینید.
+- <bdi dir="rtl">**Overview:** بخش Metrics با `roc_auc` و `f1`؛ بخش Parameters با شش param؛ Tags با `data_md5`؛ بخش Source با نام شاخه و commit. چون کد را هنوز commit نکرده‌اید، commit همان `2834c33` (یا commit آخر شما در `main`) است، یعنی پیش از این تغییر.</bdi>
+- <bdi dir="rtl">**Artifacts:** دو فایل `metrics.json` و `params.yaml`.</bdi>
+- <bdi dir="rtl">**Logged models:** یک مدل به نام `model` با وضعیت Ready. در MLflow 3 مدل هم‌رده‌ی run است و در پوشه‌ی خودش ذخیره می‌شود، نه زیر `artifacts` همان run. روی مدل کلیک کنید: `MLmodel`، `signature` و `input_example` را ببینید.</bdi>
 
-### artifactها روی S3
+### <bdi dir="rtl">artifactها روی S3</bdi>
 
 ```bash
 uv run aws --endpoint-url "$S3_ENDPOINT_URL" s3 ls s3://mlflow/ --recursive
@@ -270,7 +272,7 @@ uv run aws --endpoint-url "$S3_ENDPOINT_URL" s3 ls s3://mlflow/ --recursive
 
 مسیرها: عدد اول شماره‌ی experiment است؛ بعد `<run_id>/artifacts/` برای فایل‌های run و `models/<model_id>/artifacts/` برای مدل. مدل با فرمت `skops` ذخیره می‌شود (نه pickle). فایل‌ها روی لپ‌تاپ شما نیستند: کلاینت آن‌ها را به سرور می‌فرستد و سرور در `s3://mlflow` می‌نویسد.
 
-### `dvc repro` و run: یک دام مهم
+### <bdi dir="rtl">`dvc repro` و run: یک دام مهم</bdi>
 
 ```bash
 uv run dvc repro
@@ -299,7 +301,7 @@ git commit -m "feat: log every evaluation run to MLflow"
 
 ## گام ۴ — سه آزمایش و مقایسه (۲۵ دقیقه)
 
-`dvc exp run -S` پارامتر را موقتاً عوض می‌کند و پایپ‌لاین را اجرا می‌کند؛ چون `evaluate` هم اجرا می‌شود، هر آزمایش یک run تازه در MLflow می‌سازد. مثل جلسه‌ی ۵ بعد از هر آزمایش به حالت commit‌شده برگردید، وگرنه پارامترها روی هم انباشته می‌شوند.
+<bdi dir="rtl">`dvc exp run -S` پارامتر را موقتاً عوض می‌کند و پایپ‌لاین را اجرا می‌کند؛ چون `evaluate` هم اجرا می‌شود، هر آزمایش یک run تازه در MLflow می‌سازد. مثل جلسه‌ی ۵ بعد از هر آزمایش به حالت commit‌شده برگردید، وگرنه پارامترها روی هم انباشته می‌شوند.</bdi>
 
 آزمایش اول:
 
@@ -384,14 +386,14 @@ uv run dvc exp show --no-pager --only-changed --md --drop '^data/|^models/|^src/
 
 ### مقایسه در UI
 
-1. در `http://localhost:5050` حالت **Model training**، experiment `churn`.
+۱. در مرورگر به آدرس `http://localhost:5050` بروید و بخش **Model training** را باز کنید؛ سپس experiment با نام `churn` را پیدا کنید.
 2. چهار run را با چک‌باکس تیک بزنید و دکمه‌ی **Compare** (کنار Rename و Delete) را بزنید.
 3. در صفحه‌ی مقایسه param‌ها و metricها کنار هم می‌آیند؛ `train.C`، `roc_auc` و `f1` را بخوانید.
 4. به فهرست run‌ها برگردید و با آیکون نمودار (دومین آیکون بالای فهرست) نمودار run‌ها را ببینید. از منوی **Columns** می‌توانید param و metric را به جدول فهرست اضافه کنید.
 
 سه چیز را بخوانید:
 
-- `roc_auc` برای `train.C` از ۰٫۰۱ تا ۱۰ تقریباً ثابت است (۰٫۷۴۸۹ تا ۰٫۷۴۹۳).
+- <bdi dir="rtl">`roc_auc` برای `train.C` از ۰٫۰۱ تا ۱۰ تقریباً ثابت است (۰٫۷۴۸۹ تا ۰٫۷۴۹۳).</bdi>
 - بهترین `f1` مال `C=0.01` است (۰٫۷۰۳۳) و بدترین مال `C=10` (۰٫۶۹۸۷)؛ تفاوت‌ها کوچک‌اند.
 - هر چهار run روی یک داده و یک split ثبت شده‌اند: `data_md5` یکی است. در Tags همین را مقایسه کنید.
 
@@ -406,7 +408,7 @@ Stage 'train' is cached - skipping run, checking out outputs
 Stage 'evaluate' is cached - skipping run, checking out outputs
 ```
 
-DVC نتیجه‌ی همین ترکیب را در run-cache دارد و کد را اجرا نمی‌کند؛ پس **run تازه‌ای در MLflow نمی‌آید**. اگر عمداً run تکراری می‌خواهید:
+<bdi dir="rtl">DVC نتیجه‌ی همین ترکیب را در run-cache دارد و کد را اجرا نمی‌کند؛ پس **run تازه‌ای در MLflow نمی‌آید**. اگر عمداً run تکراری می‌خواهید:</bdi>
 
 ```bash
 uv run dvc exp run -S train.C=0.01 --force
@@ -493,7 +495,7 @@ s06: 6/6 checks passed
 ## عیب‌یابی
 
 | نشانه | علت | راه‌حل |
-|---|---|---|
+| --- | --- | --- |
 | `MLflow server not reachable at http://localhost:5050 (ConnectionError).` و بعد `exited with 1` | سرور MLflow خاموش است | `cd ~/mlops-lab/compose && docker compose up -d seaweedfs mlflow`، بعد `curl -s http://localhost:5050/health` |
 | `Invalid Host header - possible DNS rebinding attack detected` | نشانی یا پورت غیر از `localhost:5050` (مثلاً نام دیگر یا پورت عوض‌شده)؛ سرور فقط میزبان‌های فهرست `--allowed-hosts` را می‌پذیرد | از `http://localhost:5050` استفاده کنید؛ برای نشانی دیگر آن را به `--allowed-hosts` در `compose/docker-compose.yml` اضافه و `docker compose up -d mlflow` کنید |
 | `load_model` یا `download_artifacts` بدون هیچ خطا آویزان می‌شود (دقیقه‌ها) | سرور برای دانلود، نشانی امضاشده‌ی `http://seaweedfs:8333/...` می‌دهد که از لپ‌تاپ شما قابل دسترسی نیست | `MLFLOW_ENABLE_PROXY_MULTIPART_DOWNLOAD=false` در `.env` و دوباره `set -a; source .env; set +a` |
@@ -510,3 +512,5 @@ s06: 6/6 checks passed
 | `verify.sh s06` در بند «latest run has metrics.json and a model» رد می‌شود | آخرین run کامل نیست (مثلاً قطع شده) یا سطل `mlflow` پاک شده | `uv run dvc repro --force --single-item evaluate` تا run کامل تازه ساخته شود |
 
 برای جلسه‌ی بعد پروژه را روی `main` و سالم نگه دارید و run‌ها را پاک نکنید (`docker compose down -v` نزنید).
+
+</div>

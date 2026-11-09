@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # توضیح کد جلسه‌ی ۵
 
 در این جلسه کد جلسه‌ی ۱ به یک pipeline سه‌مرحله‌ای تبدیل می‌شود که DVC اجرا می‌کند. فایل‌ها: `churn/preprocess.py`، `churn/train.py`، `churn/evaluate.py`، `tests/test_pipeline.py`، `dvc.yaml`، `params.yaml` و `Makefile`. کامنت‌های داخل فایل‌ها انگلیسی‌اند تا ویرایشگر کد درست نشان بدهد؛ توضیح فارسی کامل اینجاست.
@@ -211,3 +213,5 @@ train:
 - اگر فقط `threshold` را در `params.yaml` عوض کنید، کدام مرحله‌ها دوباره اجرا می‌شوند و چرا؟
 - چرا `OUT_DIR` و `TARGET` در `preprocess.py` تعریف شده‌اند و مرحله‌های دیگر آن‌ها را import می‌کنند؟
 - اگر `random_state` را از `split` حذف کنیم، DVC چه رفتاری نشان می‌دهد؟
+
+</div>

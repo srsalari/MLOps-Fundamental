@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # آزمایشگاه جلسه‌ی ۴ — نسخه‌بندی داده با DVC (remote روی SeaweedFS)
 
 تا حالا کد را با Git نسخه‌بندی کردید، ولی فایل `churn.csv` را نه: اگر فردا داده‌ی تازه‌ای با همان نام بسازید، نسخه‌ی قبلی برای همیشه از بین می‌رود. در این آزمایشگاه با **DVC** داده را هم مثل کد «نسخه‌دار» می‌کنید: یک فایل کوچک متنی (pointer) در Git می‌ماند و خود فایل داده در انبار S3 شما (SeaweedFS) ذخیره می‌شود. بعد دو نسخه‌ی داده می‌سازید، به نسخه‌ی اول برمی‌گردید و می‌بینید دقیقاً همان متریک اول برمی‌گردد.
@@ -13,7 +15,7 @@
 git -C ~/mlops-lab pull
 ```
 
-3. SeaweedFS باید روشن باشد و ستون STATUS آن `healthy` بگوید:
+3. <bdi dir="rtl">SeaweedFS باید روشن باشد و ستون STATUS آن `healthy` بگوید:</bdi>
 
 ```bash
 cd ~/mlops-lab/compose && docker compose ps
@@ -30,7 +32,7 @@ cd ~/mlops-lab/compose && docker compose ps
 ## مفهوم‌ها در یک نگاه
 
 | واژه | معنی |
-|---|---|
+| --- | --- |
 | DVC | ابزاری که کنار Git کار می‌کند و فایل‌های بزرگ (داده، مدل) را نسخه‌بندی می‌کند |
 | pointer | فایل کوچک `churn.csv.dvc` که md5 و اندازه‌ی فایل داده را نگه می‌دارد؛ این فایل در Git می‌رود، نه خود داده |
 | md5 | «اثر انگشت» محتوای فایل؛ با تغییر یک بایت، کاملاً عوض می‌شود |
@@ -44,8 +46,8 @@ cd ~/mlops-lab/compose && docker compose ps
 
 دو داده‌ی این جلسه (عددهایی که باید دقیقاً ببینید):
 
-| | نسخه‌ی ۱ | نسخه‌ی ۲ |
-|---|---|---|
+|  | نسخه‌ی ۱ | نسخه‌ی ۲ |
+| --- | --- | --- |
 | ردیف | ۵۰۰۰ | ۸۰۰۰ |
 | churn rate | 36.1% | 52.4% |
 | اندازه | 201202 بایت | 320763 بایت |
@@ -55,11 +57,11 @@ cd ~/mlops-lab/compose && docker compose ps
 
 ## نتیجه‌ی نهایی
 
-- DVC با نسخه‌ی `3.67.1` نصب شده و pointer داده (نه خود داده) در Git است
-- remote به نام `storage` روی `s3://dvc/store` تنظیم شده و رمز فقط در `.dvc/config.local` است
+- <bdi dir="rtl">DVC با نسخه‌ی `3.67.1` نصب شده و pointer داده (نه خود داده) در Git است</bdi>
+- <bdi dir="rtl">remote به نام `storage` روی `s3://dvc/store` تنظیم شده و رمز فقط در `.dvc/config.local` است</bdi>
 - دو نسخه‌ی داده با tagهای `data-v1` و `data-v2`، هر دو در bucket به نام `dvc`
 - بازگشت به نسخه‌ی ۱ با همان md5 و همان متریک، و بازیابی داده بعد از حذف با `dvc pull`
-- Pull Request مرج‌شده در Gitea و tag نسخه‌ی `v0.2.0`
+- <bdi dir="rtl">Pull Request مرج‌شده در Gitea و tag نسخه‌ی `v0.2.0`</bdi>
 
 ---
 
@@ -90,7 +92,7 @@ uv run aws --endpoint-url "$S3_ENDPOINT_URL" s3 ls
 
 > اگر `dvc` نبود: `uv run aws --endpoint-url "$S3_ENDPOINT_URL" s3 mb s3://dvc`
 
-DVC را فقط به‌عنوان dev dependency نصب می‌کنیم (برای ساخت مدل لازم نیست، برای مدیریت داده لازم است) و نسخه را دقیق می‌نویسیم تا همه یک رفتار ببینند:
+<bdi dir="rtl">DVC را فقط به‌عنوان dev dependency نصب می‌کنیم (برای ساخت مدل لازم نیست، برای مدیریت داده لازم است) و نسخه را دقیق می‌نویسیم تا همه یک رفتار ببینند:</bdi>
 
 ```bash
 uv add --dev "dvc[s3]==3.67.1"
@@ -106,7 +108,7 @@ uv run dvc --version
 3.67.1
 ```
 
-DVC را در پروژه آماده کنید و ارسال آمار ناشناس را خاموش کنید:
+<bdi dir="rtl">DVC را در پروژه آماده کنید و ارسال آمار ناشناس را خاموش کنید:</bdi>
 
 ```bash
 uv run dvc init
@@ -130,7 +132,7 @@ A  .dvcignore
  M uv.lock
 ```
 
-> `AM` خطا نیست: یعنی `dvc init` فایل config را stage کرد و تنظیم analytics دوباره آن را عوض کرد. با `git add` زیر دوباره stage می‌شود.
+> <bdi dir="rtl">`AM` خطا نیست: یعنی `dvc init` فایل config را stage کرد و تنظیم analytics دوباره آن را عوض کرد. با `git add` زیر دوباره stage می‌شود.</bdi>
 
 ```bash
 git add .dvc .dvcignore pyproject.toml uv.lock
@@ -140,11 +142,11 @@ git add .dvc .dvcignore pyproject.toml uv.lock
 git commit -m "chore: init DVC"
 ```
 
-hookهای commit اجرا می‌شوند؛ هر کدام Passed یا Skipped است و هیچ‌کدام `Failed` نیست.
+<bdi dir="rtl">hookهای commit اجرا می‌شوند؛ هر کدام Passed یا Skipped است و هیچ‌کدام `Failed` نیست.</bdi>
 
 ## گام ۲ — ردیابی داده با `dvc add` (۱۲ دقیقه)
 
-`dvc add` سه کار می‌کند: md5 فایل را حساب می‌کند، یک نسخه از فایل را در `.dvc/cache` می‌گذارد و فایل کوچک `churn.csv.dvc` را می‌سازد. همین فایل کوچک در Git می‌رود.
+<bdi dir="rtl">`dvc add` سه کار می‌کند: md5 فایل را حساب می‌کند، یک نسخه از فایل را در `.dvc/cache` می‌گذارد و فایل کوچک `churn.csv.dvc` را می‌سازد. همین فایل کوچک در Git می‌رود.</bdi>
 
 داده را بسازید و DVC را روی آن اجرا کنید:
 
@@ -209,7 +211,7 @@ __pycache__/
 uv run dvc add data/raw/churn.csv
 ```
 
-DVC در پایان دو پیشنهاد چاپ می‌کند (`git add ...` و `core.autostage`). فعلاً به آن‌ها دست نزنید.
+<bdi dir="rtl">DVC در پایان دو پیشنهاد چاپ می‌کند (`git add ...` و `core.autostage`). فعلاً به آن‌ها دست نزنید.</bdi>
 
 ```bash
 git status --short
@@ -388,7 +390,7 @@ git add .dvc/config
 git commit -m "chore: add DVC remote on SeaweedFS"
 ```
 
-hook با نام `block hard-coded secrets` باید `Passed` بدهد.
+<bdi dir="rtl">hook با نام `block hard-coded secrets` باید `Passed` بدهد.</bdi>
 
 **اگر رمز را بدون `--local` نوشتید:** این hook commit را رد می‌کند و شماره‌ی خط را می‌گوید (مثلاً `.dvc/config:7`). رمز را از فایل config پاک کنید و دوباره آن را فقط با `--local` بدهید:
 
@@ -493,7 +495,7 @@ Modified:
 files summary: 1 modified
 ```
 
-`dvc diff` نمی‌گوید کدام ردیف‌ها عوض شدند؛ فقط می‌گوید کدام فایل عوض شده و md5 قبل و بعد چه بود. تحلیل ردیف‌ها کار pandas است. حالا مدل را روی داده‌ی تازه بسازید:
+<bdi dir="rtl">`dvc diff` نمی‌گوید کدام ردیف‌ها عوض شدند؛ فقط می‌گوید کدام فایل عوض شده و md5 قبل و بعد چه بود. تحلیل ردیف‌ها کار pandas است. حالا مدل را روی داده‌ی تازه بسازید:</bdi>
 
 ```bash
 make train
@@ -505,9 +507,9 @@ make train
 {'roc_auc': 0.7493, 'f1': 0.6991}
 ```
 
-AUC پایین آمد ولی f1 بالا رفت. دلیلش این است که نرخ ریزش از ۳۶٫۱٪ به ۵۲٫۴٪ رسیده و f1 به فراوانی کلاس مثبت حساس است. دو مدل روی دو توزیع مختلف را با یک عدد مقایسه نکنید.
+<bdi dir="rtl">AUC پایین آمد ولی f1 بالا رفت. دلیلش این است که نرخ ریزش از ۳۶٫۱٪ به ۵۲٫۴٪ رسیده و f1 به فراوانی کلاس مثبت حساس است. دو مدل روی دو توزیع مختلف را با یک عدد مقایسه نکنید.</bdi>
 
-pointer جدید را commit و tag کنید:
+<bdi dir="rtl">pointer جدید را commit و tag کنید:</bdi>
 
 ```bash
 git add data/raw/churn.csv.dvc
@@ -658,7 +660,7 @@ make train
 {'roc_auc': 0.7493, 'f1': 0.6991}
 ```
 
-> cache پاک‌شده فقط نسخه‌ی ۲ را دوباره گرفت. اگر بعداً دوباره به `data-v1` رفتید و `dvc checkout` خطا داد، بزنید `uv run dvc pull`.
+> <bdi dir="rtl">cache پاک‌شده فقط نسخه‌ی ۲ را دوباره گرفت. اگر بعداً دوباره به `data-v1` رفتید و `dvc checkout` خطا داد، بزنید `uv run dvc pull`.</bdi>
 
 ### ج) Pull Request و tag
 
@@ -676,7 +678,7 @@ git switch main && git pull
 git tag -a v0.2.0 -m "Session 4: DVC"
 ```
 
-tagهای داده فقط با `--tags` به Gitea می‌روند:
+<bdi dir="rtl">tagهای داده فقط با `--tags` به Gitea می‌روند:</bdi>
 
 ```bash
 git push origin --tags
@@ -769,7 +771,7 @@ uv run dvc pull
 ## عیب‌یابی
 
 | نشانه | علت | راه‌حل |
-|---|---|---|
+| --- | --- | --- |
 | `ERROR: bad DVC file name ... is git-ignored` | قاعده‌ی `data/` در `.gitignore` جلسه‌ی ۱ | `git check-ignore -v data/raw/churn.csv.dvc`، سپس خط را پاک کنید (گام ۲) |
 | `ERROR: failed to initiate DVC ... is not tracked by any supported SCM tool` | داخل مخزن Git نیستید | `cd ~/work/churn-mlops` |
 | `ERROR: failed to initiate DVC - '.dvc' exists. Use -f to force` | `dvc init` را دوباره زده‌اید | مشکلی نیست؛ ادامه دهید |
@@ -796,3 +798,5 @@ uv run dvc pull
 | روی detached HEAD تغییری commit کرده‌اید | بعد از `git checkout data-v1` کار کرده‌اید | برای نگه‌داشتن: `git switch -c نام-شاخه`؛ وگرنه رها کنید |
 
 جلسه‌ی بعد روی همین داده و همین remote ساخته می‌شود: SeaweedFS را خاموش نکنید و `docker compose down -v` نزنید.
+
+</div>

@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # آزمایشگاه جلسه‌ی ۲ — Git برای ML و کیفیت کد
 
 در این آزمایشگاه پروژه‌ی جلسه‌ی ۱ را روی یک سرور Git (Gitea) می‌گذارید، با شاخه و Pull Request کار می‌کنید، آزمون می‌نویسید و نگهبان‌هایی نصب می‌کنید که جلوی commit شدن کد نامرتب و رمز را می‌گیرند.
@@ -33,12 +35,12 @@ K=~/mlops-lab/s02
 
 - مخزن `churn-mlops` روی Gitea، با دو Pull Request ادغام‌شده و tag نسخه‌ی `v0.1.0`
 - چهار آزمون سبز
-- hookهایی که فایل env و کلید داخل کد را رد می‌کنند
+- <bdi dir="rtl">hookهایی که فایل env و کلید داخل کد را رد می‌کنند</bdi>
 
 ## فایل‌های این پوشه
 
 | فایل | مقصد در پروژه | کار |
-|---|---|---|
+| --- | --- | --- |
 | `pyproject-snippet.toml` | انتهای `pyproject.toml` | تنظیمات ruff و pytest |
 | `test_data.py` | `tests/` | دو آزمون برای داده |
 | `test_train.py` | `tests/` | یک آزمون برای مدل؛ آزمون چهارم را خودتان می‌نویسید |
@@ -111,7 +113,7 @@ git log --oneline --all
 
 ## گام ۱ — Gitea و اولین push (۱۵ دقیقه)
 
-Gitea را بالا بیاورید:
+<bdi dir="rtl">Gitea را بالا بیاورید:</bdi>
 
 ```bash
 cd ~/mlops-lab/compose && cp -n .env.example .env; docker compose up -d gitea
@@ -158,7 +160,7 @@ Moves the decision threshold from code to configs/params.yaml (eval block).
 Metrics unchanged: roc_auc 0.802, f1 0.5969.
 ```
 
-Create Pull Request. زبانه‌ی Files Changed را ببینید، بعد Create merge commit و Delete Branch.
+<bdi dir="rtl">Create Pull Request. زبانه‌ی Files Changed را ببینید، بعد Create merge commit و Delete Branch.</bdi>
 
 لپ‌تاپ را هم‌گام کنید:
 
@@ -234,7 +236,7 @@ uv run pytest -q
 - با `X, y = _xy()` داده بگیرید.
 - مدل را مثل آزمون بالایی بسازید و آموزش دهید.
 - با `X.head(1).assign(contract="weekly")` یک مشتری بسازید.
-- `model.predict(...)` را روی او صدا بزنید و بررسی کنید خروجی یک عضو دارد.
+- <bdi dir="rtl">`model.predict(...)` را روی او صدا بزنید و بررسی کنید خروجی یک عضو دارد.</bdi>
 
 ```bash
 uv run pytest -q
@@ -338,7 +340,7 @@ s02: 5/5 checks passed
 ## عیب‌یابی
 
 | نشانه | علت | راه‌حل |
-|---|---|---|
+| --- | --- | --- |
 | `nothing to commit, working tree clean` | فایلی تغییر نکرده یا ذخیره نشده | فایل را ذخیره کنید؛ `git status --short` |
 | `found character '\t' that cannot start any token` | در فایل YAML کاراکتر Tab هست | خط را پاک و با فاصله (Space) دوباره تایپ کنید؛ `cat -et configs/params.yaml` کاراکترهای پنهان را نشان می‌دهد |
 | `KeyError: 'eval'` یا `KeyError: 'threshold'` | بخش `eval` ذخیره نشده یا با حرف بزرگ نوشته شده | باید دقیقاً `eval:` و `threshold:` با حروف کوچک باشد |
@@ -359,4 +361,6 @@ s02: 5/5 checks passed
 | `paths are ignored: .env` | `.env` در gitignore است | برای آزمایش: `git add -f .env` |
 | `ModuleNotFoundError: make_dataset` در pytest | بخش `[tool.pytest.ini_options]` به `pyproject.toml` اضافه نشده | گام ۳ را دوباره ببینید |
 
-`git commit --no-verify` راه‌حل هیچ‌کدام از این‌ها نیست؛ پیام خطا را بخوانید و علت را رفع کنید.
+<bdi dir="rtl">`git commit --no-verify` راه‌حل هیچ‌کدام از این‌ها نیست؛ پیام خطا را بخوانید و علت را رفع کنید.</bdi>
+
+</div>

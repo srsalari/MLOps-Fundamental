@@ -1,17 +1,27 @@
 # kind cluster for the course (single node is enough for 16GB laptops).
 # Node image is passed by scripts/kind-up.sh (--image) from versions.env.
+# Created in session 11; used by sessions 11-13.
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+# cluster name: the kubectl context becomes "kind-mlops"
 name: mlops
 nodes:
+  # One node that is both control plane and worker (no extra worker nodes needed).
   - role: control-plane
     labels:
+      # Traefik has a nodeSelector for this label, so it is scheduled on this node.
       ingress-ready: "true"
+    # Publish node ports on the laptop (the node is itself a Docker container).
     extraPortMappings:
       # Traefik NodePorts -> laptop ports (session 12)
+      # Traefik "web" NodePort (see traefik-values.yaml)
       - containerPort: 30080
+        # http://localhost:8080 on the laptop
         hostPort: 8080
+        # only this laptop can connect
         listenAddress: "127.0.0.1"
+      # Traefik "websecure" (HTTPS) NodePort
       - containerPort: 30443
+        # https://localhost:8443 on the laptop
         hostPort: 8443
         listenAddress: "127.0.0.1"

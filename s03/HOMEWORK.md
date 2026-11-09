@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # تکلیف جلسه‌ی ۳
 
 مهلت: پیش از شروع جلسه‌ی ۴. همه‌ی کارها روی یک شاخه‌ی تازه و با یک Pull Request وارد `main` شوند.
@@ -6,13 +8,13 @@
 cd ~/work/churn-mlops && git switch main && git pull && git switch -c feature/homework-3
 ```
 
-SeaweedFS باید روشن باشد (در `~/mlops-lab/compose` دستور `docker compose ps` وضعیت `healthy` بدهد).
+<bdi dir="rtl">SeaweedFS باید روشن باشد (در `~/mlops-lab/compose` دستور `docker compose ps` وضعیت `healthy` بدهد).</bdi>
 
 ## ۱. بخش «Local storage» در README
 
 در `README.md` پروژه یک بخش با عنوان `Local storage` اضافه کنید که یک هم‌تیمی تازه بتواند با آن:
 
-- SeaweedFS را بالا بیاورد،
+- <bdi dir="rtl">SeaweedFS را بالا بیاورد،</bdi>
 - فایل `.env` را از روی نمونه بسازد،
 - دو bucket `dvc` و `mlflow` را بسازد.
 
@@ -59,7 +61,7 @@ uv run aws --endpoint-url http://localhost:8334 s3 ls
 
 ## ۴. سالم نگه داشتن محیط
 
-Docker و SeaweedFS را تا جلسه‌ی ۴ سالم نگه دارید. جلسه‌ی ۴ از bucket `dvc` استفاده می‌کند. فقط `dvc` و `mlflow` باید bucket باشند؛ اگر bucket اضافه (مثل نام اشتباه) ساخته‌اید، پاکش کنید.
+<bdi dir="rtl">Docker و SeaweedFS را تا جلسه‌ی ۴ سالم نگه دارید. جلسه‌ی ۴ از bucket `dvc` استفاده می‌کند. فقط `dvc` و `mlflow` باید bucket باشند؛ اگر bucket اضافه (مثل نام اشتباه) ساخته‌اید، پاکش کنید.</bdi>
 
 ```bash
 set -a; source .env; set +a
@@ -97,3 +99,5 @@ git switch main && git pull
 3. متن بخش `Local storage` و جدول خطاها از `README.md`
 4. یک جمله: بعد از `docker compose down` چرا `churn.csv` هنوز هست، و با `-v` چه می‌شد؟
 5. یک جمله: امروز کدام بخش مبهم‌تر بود، Docker یا S3؟
+
+</div>

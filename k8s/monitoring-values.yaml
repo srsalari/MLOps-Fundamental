@@ -1,10 +1,16 @@
 # kube-prometheus-stack trimmed for 16GB laptops (session 13). ~1GB RAM total.
+# Helm values: helm install monitoring prometheus-community/kube-prometheus-stack -f k8s/monitoring-values.yaml
+# Components we do not need in a one-node kind lab are switched off to save memory.
 alertmanager:
+  # no alert routing in this course
   enabled: false
 nodeExporter:
+  # host-level metrics are not needed in kind
   enabled: false
 defaultRules:
+  # skip the large set of built-in alert rules
   create: false
+# Control-plane components of kind are not scrapeable the usual way; disable their monitors.
 kubeEtcd: {enabled: false}
 kubeScheduler: {enabled: false}
 kubeControllerManager: {enabled: false}
@@ -19,7 +25,9 @@ prometheusOperator:
     limits: {memory: 256Mi}
 prometheus:
   prometheusSpec:
+    # keep metrics for two days only
     retention: 2d
+    # how often Prometheus reads metrics
     scrapeInterval: 15s
     # pick up ServiceMonitors/PodMonitors created by students in any namespace
     serviceMonitorSelectorNilUsesHelmValues: false
@@ -30,12 +38,14 @@ prometheus:
       limits: {memory: 800Mi}
 grafana:
   adminPassword: mlops-lab   # LAB-ONLY
+  # no built-in dashboards; students add their own
   defaultDashboardsEnabled: false
   resources:
     requests: {cpu: 50m, memory: 128Mi}
     limits: {memory: 384Mi}
   sidecar:
     dashboards:
+      # a sidecar loads dashboards from labelled ConfigMaps
       enabled: true
       searchNamespace: ALL   # students ship dashboards as ConfigMaps with label grafana_dashboard=1
 kube-state-metrics:

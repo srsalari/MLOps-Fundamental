@@ -1,23 +1,34 @@
 # Traefik ingress controller for kind (session 12). Replaces the retired ingress-nginx.
+# Helm values: helm install traefik traefik/traefik -f k8s/traefik-values.yaml
 deployment:
-  replicas: 1
+  replicas: 1          # one copy is enough for a lab
+# kind has no cloud load balancer, so expose fixed node ports.
+# Chart 41.x: the Service type lives under service.spec (a plain service.type is ignored
+# and you get a LoadBalancer with EXTERNAL-IP <pending> forever).
 service:
-  type: NodePort
+  spec:
+    type: NodePort
 ports:
   web:
+    # HTTP; kind-config.yaml maps it to laptop port 8080
     nodePort: 30080
   websecure:
+    # HTTPS; kind-config.yaml maps it to laptop port 8443
     nodePort: 30443
 ingressClass:
   enabled: true
+  # Ingress objects without a class name use Traefik
   isDefaultClass: true
 providers:
   kubernetesIngress:
+    # watch normal Kubernetes Ingress objects
     enabled: true
   kubernetesGateway:
     enabled: false        # Gateway API is shown as a preview only
+# Run only on the node labelled in kind-config.yaml.
 nodeSelector:
   ingress-ready: "true"
+# Small requests/limits so the lab fits on a 16GB laptop.
 resources:
   requests: {cpu: 50m, memory: 64Mi}
   limits: {memory: 256Mi}

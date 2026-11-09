@@ -1,3 +1,5 @@
+<div dir="rtl" style="font-family: 'Vazirmatn', 'IRANSansX', Tahoma, sans-serif;">
+
 # آزمایشگاه جلسه‌ی ۳ — مبانی Docker و ذخیره‌ساز شیء (SeaweedFS S3)
 
 در این آزمایشگاه Docker را با دست امتحان می‌کنید (image، container، port، volume)، سرویس SeaweedFS را با Docker Compose روشن می‌کنید، با AWS CLI دو bucket به نام‌های `dvc` و `mlflow` می‌سازید و فایل `churn.csv` را بالا و پایین می‌برید. جلسه‌ی ۴ (DVC) و جلسه‌ی ۶ (MLflow) روی همین انبار کار می‌کنند.
@@ -6,15 +8,15 @@
 
 ## پیش از شروع
 
-1. پروژه‌ی جلسه‌ی ۲ سالم باشد: پوشه‌ی `~/work/churn-mlops`، چهار آزمون سبز، tag نسخه‌ی `v0.1.0` و مخزن روی Gitea.
-2. Docker Desktop (یا Colima) روشن باشد و حافظه‌ی آن دست‌کم ۸ گیگابایت باشد.
-3. مخزن دوره را به‌روز کنید:
+۱. پروژه‌ی جلسه‌ی ۲ سالم باشد: پوشه‌ی `~/work/churn-mlops`، چهار آزمون سبز، tag نسخه‌ی `v0.1.0` و مخزن روی Gitea.
+۲. Docker Desktop (یا Colima) روشن باشد و حافظه‌ی آن دست‌کم ۸ گیگابایت باشد.
+۳. مخزن دوره را به‌روز کنید:
 
 ```bash
 git -C ~/mlops-lab pull
 ```
 
-4. فایل `.env` کنار `docker-compose.yml` باشد (در جلسه‌ی ۲ ساخته شد):
+۴. فایل `.env` کنار `docker-compose.yml` باشد (در جلسه‌ی ۲ ساخته شد):
 
 ```bash
 ls ~/mlops-lab/compose/.env
@@ -26,15 +28,15 @@ ls ~/mlops-lab/compose/.env
 cp ~/mlops-lab/compose/.env.example ~/mlops-lab/compose/.env
 ```
 
-5. آماده بودن لپ‌تاپ را بسنجید:
+۵. آماده بودن لپ‌تاپ را بسنجید:
 
 ```bash
-~/mlops-lab/scripts/preflight.sh
+~/mlops-lab/scripts/preflight.sh s03
 ```
 
-فقط بخش‌های `[Container runtime]` و `[Lab images loaded]` امروز مهم‌اند. اگر پایان خروجی `NOT READY` شد چون `kind` یا `helm` هنوز نصب نیست، نگران نباشید.
+انتظار: آخرین خط `READY for session 3` باشد. اگر `WARN` درباره‌ی پورت دیدید، یعنی برنامه یا کانتینر دیگری آن پورت را گرفته؛ نام آن در همان خط آمده و باید آن را متوقف کنید. بخش `[Later sessions]` فقط ابزارهای جلسه‌های بعدی را نشان می‌دهد و در نتیجه اثری ندارد. اگر `FAIL` دیدید، راه حل در انتهای همان خط نوشته شده است.
 
-6. چهار image امروز روی لپ‌تاپ باشد (`seaweedfs`، `gitea`، `nginx` و `python`):
+۶. چهار image امروز روی لپ‌تاپ باشد (`seaweedfs`، `gitea`، `nginx` و `python`):
 
 ```bash
 docker images | grep -E "nginx|python|seaweedfs|gitea"
@@ -42,24 +44,24 @@ docker images | grep -E "nginx|python|seaweedfs|gitea"
 
 باید `nginx 1.28-alpine` و `python 3.12-slim-bookworm` را هم ببینید. در کلاس اینترنت نیست؛ اگر نبودند از بسته‌ی دوره با `docker load` بارگذاری می‌شوند (مدرس کمک می‌کند).
 
-7. پورت‌های ۸۳۳۳، ۹۳۳۳، ۸۸۸۸، ۸۰۸۱ و ۸۰۸۲ روی لپ‌تاپ آزاد باشد. پورت ۸۰۸۰ را امروز نمی‌گیریم؛ برای ingress جلسه‌های Kubernetes رزرو است.
+۷. پورت‌های ۸۳۳۳، ۹۳۳۳، ۸۸۸۸، ۸۰۸۱ و ۸۰۸۲ روی لپ‌تاپ آزاد باشد. پورت ۸۰۸۰ را امروز نمی‌گیریم؛ برای ingress جلسه‌های Kubernetes رزرو است.
 
 گام‌های ۱ تا ۳ به پروژه‌ی `churn-mlops` نیاز ندارند و فقط Docker لازم است. گام‌های ۴ و ۵ داخل `~/work/churn-mlops` اجرا می‌شوند. دانشجوهای Windows همه‌ی دستورها را داخل WSL Ubuntu اجرا کنند، نه PowerShell، و پوشه‌ها را داخل فایل‌سیستم WSL (مثل `~/work`) بسازند، نه در `/mnt/c`.
 
 ## مفهوم‌ها در یک نگاه
 
-| واژه | معنی |
-|---|---|
-| image | دستورپخت و مواد یک برنامه؛ فقط‌خواندنی است و عوض نمی‌شود |
-| container | جعبه‌ای که از روی یک image روشن شده و کار می‌کند؛ با `rm` از بین می‌رود |
-| port mapping | `-p 8081:80` یعنی پورت ۸۰۸۱ لپ‌تاپ به پورت ۸۰ داخل کانتینر وصل شود؛ چپ همیشه لپ‌تاپ است، راست کانتینر |
-| bind mount | نشان دادن یک پوشه‌ی لپ‌تاپ داخل کانتینر؛ با `:ro` فقط خواندنی است |
-| volume | قمقمه‌ی جدای Docker برای داده؛ با حذف کانتینر نمی‌رود |
-| Docker Compose | فایل `docker-compose.yml` مثل برگه‌ی سفارش است: چه image، کدام پورت، کدام volume |
-| S3 | انبار شیء: هر فایل یک «شیء» با یک «کلید» است، داخل یک bucket |
-| bucket | بالاترین سطح پوشه در S3؛ ما دو تا می‌سازیم: `dvc` و `mlflow` |
-| endpoint | نشانی انبار؛ برای ما `http://localhost:8333` (`--endpoint-url`) |
-| checksum | اثر انگشت فایل؛ دو فایل با اثر انگشت یکسان یک فایل‌اند |
+| معنی | واژه |
+| --- | --- |
+| دستورپخت و مواد یک برنامه؛ فقط‌خواندنی است و عوض نمی‌شود | image |
+| جعبه‌ای که از روی یک image روشن شده و کار می‌کند؛ با `rm` از بین می‌رود | container |
+| `-p 8081:80` یعنی پورت ۸۰۸۱ لپ‌تاپ به پورت ۸۰ داخل کانتینر وصل شود؛ چپ همیشه لپ‌تاپ است، راست کانتینر | port mapping |
+| نشان دادن یک پوشه‌ی لپ‌تاپ داخل کانتینر؛ با `:ro` فقط خواندنی است | bind mount |
+| قمقمه‌ی جدای Docker برای داده؛ با حذف کانتینر نمی‌رود | volume |
+| فایل `docker-compose.yml` مثل برگه‌ی سفارش است: چه image، کدام پورت، کدام volume | Docker Compose |
+| انبار شیء: هر فایل یک «شیء» با یک «کلید» است، داخل یک bucket | S3 |
+| بالاترین سطح پوشه در S3؛ ما دو تا می‌سازیم: `dvc` و `mlflow` | bucket |
+| نشانی انبار؛ برای ما `http://localhost:8333` (`--endpoint-url`) | endpoint |
+| اثر انگشت فایل؛ دو فایل با اثر انگشت یکسان یک فایل‌اند | checksum |
 
 سه پورت SeaweedFS: ۸۳۳۳ برای S3، ۹۳۳۳ صفحه‌ی مدیریتی Master، ۸۸۸۸ صفحه‌ی Filer.
 
@@ -75,11 +77,11 @@ docker images | grep -E "nginx|python|seaweedfs|gitea"
 
 این جلسه فایل آماده‌ای برای کپی ندارد؛ همه‌چیز را خودتان می‌سازید. تنها فایل تازه‌ی پروژه `.env.example` است که در گام ۴ می‌نویسید.
 
-| فایل | کجا | کار |
-|---|---|---|
-| `docker-compose.yml` | `~/mlops-lab/compose/` | سرویس SeaweedFS (از قبل هست؛ تغییرش ندهید) |
-| `.env.example` | ریشه‌ی `~/work/churn-mlops` | نمونه‌ی تنظیمات S3 با `CHANGE_ME`؛ در Git می‌رود |
-| `.env` | ریشه‌ی `~/work/churn-mlops` | تنظیمات واقعی با کلید؛ هرگز در Git نمی‌رود |
+| کار | کجا | فایل |
+| --- | --- | --- |
+| سرویس SeaweedFS (از قبل هست؛ تغییرش ندهید) | `~/mlops-lab/compose/` | `docker-compose.yml` |
+| نمونه‌ی تنظیمات S3 با `CHANGE_ME`؛ در Git می‌رود | ریشه‌ی `~/work/churn-mlops` | `.env.example` |
+| تنظیمات واقعی با کلید؛ هرگز در Git نمی‌رود | ریشه‌ی `~/work/churn-mlops` | `.env` |
 
 ---
 
@@ -617,33 +619,35 @@ s03: 9/9 checks passed   (commit ..., branch main)
 
 ## عیب‌یابی
 
-| نشانه | علت | راه‌حل |
-|---|---|---|
-| `failed to connect to the docker API ... is the daemon running` | Docker روشن نیست | Docker Desktop را باز کنید (یا `colima start`) و `docker ps` را دوباره بزنید |
-| `Bind for 0.0.0.0:8081 failed: port is already allocated` | پورت ۸۰۸۱ را کانتینر یا برنامه‌ی دیگری گرفته | `docker ps`؛ کانتینر قبلی را با نام کامل حذف کنید یا پورت ۸۰۸۲ بدهید |
-| `Conflict. The container name "/web" is already in use` | کانتینری با همین نام هست | `docker rm web` (نام کامل) |
-| `Unable to find image ... locally` | نام یا tag اشتباه است یا image بارگذاری نشده | با `docker images` مقایسه کنید؛ از بسته‌ی دوره `docker load` کنید |
-| `curl` در Windows نیست | WSL بدون curl | `http://localhost:8081` را در مرورگر باز کنید |
-| مسیر `site` نسبی داده شد و کار نکرد | Docker مسیر مطلق می‌خواهد | `"$PWD/site:..."` را بنویسید |
-| `no configuration file provided: not found` | داخل پوشه‌ی `compose` نیستید | `cd ~/mlops-lab/compose` |
-| `port is already allocated` برای ۸۳۳۳، ۹۳۳۳ یا ۸۸۸۸ | برنامه‌ی دیگری (مثل MinIO یا SeaweedFS قدیمی) پورت را گرفته | `lsof -i :8333` (در لینوکس `ss -ltnp`) |
-| وضعیت مدتی `Up` است ولی `healthy` نمی‌شود | SeaweedFS هنوز بالا نیامده | ۳۰ ثانیه صبر کنید، بعد `docker compose logs seaweedfs` |
-| حافظه کم است | SeaweedFS حدود ۱۵۰ مگابایت می‌گیرد | `docker compose stop gitea` موقتاً؛ حافظه‌ی Docker را ۸ گیگابایت کنید |
-| `Unable to locate credentials` | `.env` را source نکرده‌اید یا ترمینال تازه است | `set -a; source .env; set +a` و تعریف دوباره‌ی تابع `s3` |
-| `SignatureDoesNotMatch` | secret اشتباه است (غلط املایی، فاصله یا خط اضافه) | با `~/mlops-lab/compose/.env` مقایسه کنید |
-| `InvalidAccessKeyId` | key اشتباه است | همان مقایسه |
-| `Could not connect to the endpoint URL` | SeaweedFS بالا نیست یا نشانی غلط است | `docker compose ps`؛ نشانی باید `http` (نه `https`) و پورت ۸۳۳۳ باشد |
-| `NoSuchBucket` | `mb` را نزده‌اید | `s3 mb s3://dvc` |
-| `BucketAlreadyOwnedByYou` | bucket از قبل هست | مشکلی نیست |
-| `s3 ls` یک bucket اضافه نشان می‌دهد | نام را اشتباه تایپ کرده‌اید و `cp` موفق شده (SeaweedFS خطا نمی‌دهد) | نام bucket اضافه را به مدرس نشان دهید تا با هم پاکش کنید؛ دفعه‌ی بعد نام را کپی کنید |
-| `uv add` خطا می‌دهد | اینترنت یا بسته‌ی آفلاین نیست | `uv sync` را بزنید و به مدرس خبر بدهید |
-| `shasum: command not found` | لینوکس | `sha256sum` به‌جای آن |
-| فایل `.env` در `git status` دیده می‌شود | نام فایل اشتباه است یا در `.gitignore` نیست | `git check-ignore -v .env` باید خط `.gitignore` را نشان دهد |
-| فایل `.env` تصادفاً stage شده | `git add .` | `git restore --staged .env` |
-| commit رد می‌شود (`block hard-coded secrets` برابر `Failed`) | کلید واقعی در `.env.example` است | مقدارها را به `CHANGE_ME` برگردانید و دوباره `git add` |
-| push رد می‌شود (`non-fast-forward` یا شکست آزمون) | پیام را بخوانید؛ معمولاً `pytest` | `uv run pytest -q` و خطا را رفع کنید |
-| `Authentication failed` در push | نام کاربری Gitea | نام کاربری `student` است، نه ایمیل |
-| `verify.sh s03` می‌گوید `local main == origin main` شکست خورده | PR هنوز ادغام نشده یا `git pull` نزده‌اید | PR را ادغام کنید، بعد `git switch main && git pull` |
-| بعد از `down -v` همه‌چیز رفت | گزینه‌ی `-v` volumeها را پاک کرد | پوشه‌ی `~/work/churn-mlops` سالم است؛ به مدرس بگویید تا مخزن Gitea را دوباره بسازید و گام ۴ را برای پر کردن SeaweedFS تکرار کنید |
+| راه‌حل | علت | نشانه |
+| --- | --- | --- |
+| Docker Desktop را باز کنید (یا `colima start`) و `docker ps` را دوباره بزنید | Docker روشن نیست | `failed to connect to the docker API ... is the daemon running` |
+| `docker ps`؛ کانتینر قبلی را با نام کامل حذف کنید یا پورت ۸۰۸۲ بدهید | پورت ۸۰۸۱ را کانتینر یا برنامه‌ی دیگری گرفته | `Bind for 0.0.0.0:8081 failed: port is already allocated` |
+| `docker rm web` (نام کامل) | کانتینری با همین نام هست | `Conflict. The container name "/web" is already in use` |
+| با `docker images` مقایسه کنید؛ از بسته‌ی دوره `docker load` کنید | نام یا tag اشتباه است یا image بارگذاری نشده | `Unable to find image ... locally` |
+| `http://localhost:8081` را در مرورگر باز کنید | WSL بدون curl | `curl` در Windows نیست |
+| `"$PWD/site:..."` را بنویسید | Docker مسیر مطلق می‌خواهد | مسیر `site` نسبی داده شد و کار نکرد |
+| `cd ~/mlops-lab/compose` | داخل پوشه‌ی `compose` نیستید | `no configuration file provided: not found` |
+| `lsof -i :8333` (در لینوکس `ss -ltnp`) | برنامه‌ی دیگری (مثل MinIO یا SeaweedFS قدیمی) پورت را گرفته | `port is already allocated` برای ۸۳۳۳، ۹۳۳۳ یا ۸۸۸۸ |
+| ۳۰ ثانیه صبر کنید، بعد `docker compose logs seaweedfs` | SeaweedFS هنوز بالا نیامده | وضعیت مدتی `Up` است ولی `healthy` نمی‌شود |
+| `docker compose stop gitea` موقتاً؛ حافظه‌ی Docker را ۸ گیگابایت کنید | SeaweedFS حدود ۱۵۰ مگابایت می‌گیرد | حافظه کم است |
+| `set -a; source .env; set +a` و تعریف دوباره‌ی تابع `s3` | `.env` را source نکرده‌اید یا ترمینال تازه است | `Unable to locate credentials` |
+| با `~/mlops-lab/compose/.env` مقایسه کنید | secret اشتباه است (غلط املایی، فاصله یا خط اضافه) | `SignatureDoesNotMatch` |
+| همان مقایسه | key اشتباه است | `InvalidAccessKeyId` |
+| `docker compose ps`؛ نشانی باید `http` (نه `https`) و پورت ۸۳۳۳ باشد | SeaweedFS بالا نیست یا نشانی غلط است | `Could not connect to the endpoint URL` |
+| `s3 mb s3://dvc` | `mb` را نزده‌اید | `NoSuchBucket` |
+| مشکلی نیست | bucket از قبل هست | `BucketAlreadyOwnedByYou` |
+| نام bucket اضافه را به مدرس نشان دهید تا با هم پاکش کنید؛ دفعه‌ی بعد نام را کپی کنید | نام را اشتباه تایپ کرده‌اید و `cp` موفق شده (SeaweedFS خطا نمی‌دهد) | `s3 ls` یک bucket اضافه نشان می‌دهد |
+| `uv sync` را بزنید و به مدرس خبر بدهید | اینترنت یا بسته‌ی آفلاین نیست | `uv add` خطا می‌دهد |
+| `sha256sum` به‌جای آن | لینوکس | `shasum: command not found` |
+| `git check-ignore -v .env` باید خط `.gitignore` را نشان دهد | نام فایل اشتباه است یا در `.gitignore` نیست | فایل `.env` در `git status` دیده می‌شود |
+| `git restore --staged .env` | `git add .` | فایل `.env` تصادفاً stage شده |
+| مقدارها را به `CHANGE_ME` برگردانید و دوباره `git add` | کلید واقعی در `.env.example` است | commit رد می‌شود (`block hard-coded secrets` برابر `Failed`) |
+| `uv run pytest -q` و خطا را رفع کنید | پیام را بخوانید؛ معمولاً `pytest` | push رد می‌شود (`non-fast-forward` یا شکست آزمون) |
+| نام کاربری `student` است، نه ایمیل | نام کاربری Gitea | `Authentication failed` در push |
+| PR را ادغام کنید، بعد `git switch main && git pull` | PR هنوز ادغام نشده یا `git pull` نزده‌اید | `verify.sh s03` می‌گوید `local main == origin main` شکست خورده |
+| پوشه‌ی `~/work/churn-mlops` سالم است؛ به مدرس بگویید تا مخزن Gitea را دوباره بسازید و گام ۴ را برای پر کردن SeaweedFS تکرار کنید | گزینه‌ی `-v` volumeها را پاک کرد | بعد از `down -v` همه‌چیز رفت |
 
 برای جلسه‌ی بعد SeaweedFS و bucketها را نگه دارید (`docker compose down -v` نزنید). جلسه‌ی ۴ با DVC روی همین bucket `dvc` کار می‌کند.
+
+</div>

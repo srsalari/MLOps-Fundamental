@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # آزمایشگاه جلسه‌ی ۵ — پایپ‌لاین DVC و بازتولیدپذیری
 
 در این آزمایشگاه کد آموزش را به سه مرحله‌ی جدا (`preprocess`، `train`، `evaluate`) می‌شکنید، آن‌ها را در `dvc.yaml` به هم وصل می‌کنید و می‌بینید DVC فقط مرحله‌هایی را دوباره اجرا می‌کند که ورودی‌شان عوض شده است. بعد چند آزمایش با پارامتر مختلف اجرا و مقایسه می‌کنید.
@@ -42,14 +44,14 @@ uv run python -m churn.train --config configs/params.yaml
 ## نتیجه‌ی نهایی
 
 - سه مرحله‌ی `preprocess`، `train`، `evaluate` در `dvc.yaml` و فایل `dvc.lock` در Git
-- `dvc repro` بدون تغییر هیچ مرحله‌ای را اجرا نمی‌کند
+- <bdi dir="rtl">`dvc repro` بدون تغییر هیچ مرحله‌ای را اجرا نمی‌کند</bdi>
 - پنج آزمایش با `dvc exp run` و جدول مقایسه
 - مخزن روی Gitea با Pull Request ادغام‌شده و tag نسخه‌ی `v0.3.0`، و خروجی‌ها روی remote
 
 ## فایل‌های این پوشه
 
 | فایل | مقصد در پروژه | کار |
-|---|---|---|
+| --- | --- | --- |
 | `churn/preprocess.py` | `src/churn/` | خواندن داده‌ی خام و تقسیم به train و test |
 | `churn/train.py` | `src/churn/` | آموزش مدل روی train (جای فایل قبلی) |
 | `churn/evaluate.py` | `src/churn/` | امتیازدهی test و نوشتن `metrics.json` |
@@ -111,7 +113,7 @@ git commit -m "refactor: split training into preprocess/train/evaluate modules"
 فایل `dvc.yaml` که در گام ۱ کپی کردید را باز کنید. هر مرحله چهار بخش دارد:
 
 | کلید | معنی |
-|---|---|
+| --- | --- |
 | `cmd` | دستوری که مرحله را اجرا می‌کند |
 | `deps` | فایل‌هایی که اگر عوض شوند مرحله باید دوباره اجرا شود |
 | `params` | کلیدهای `params.yaml` که این مرحله می‌خواند (فقط همین‌ها حساب می‌شوند) |
@@ -258,7 +260,7 @@ metrics.json  f1        0.6991  0.7376       0.0385
 metrics.json  roc_auc   0.7493  0.7493       0.0
 ```
 
-`roc_auc` تکان نخورد (به آستانه وابسته نیست)، `f1` بالا رفت. بدون `--all` فقط ردیف‌های تغییرکرده را می‌بینید.
+<bdi dir="rtl">`roc_auc` تکان نخورد (به آستانه وابسته نیست)، `f1` بالا رفت. بدون `--all` فقط ردیف‌های تغییرکرده را می‌بینید.</bdi>
 
 حالا به حالت commit‌شده برگردید:
 
@@ -296,7 +298,7 @@ Stage 'evaluate' didn't change, skipping
 به عبارت `cached - skipping run` دقت کنید: هیچ کدی اجرا نشد، فایل‌ها از cache برگشتند.
 
 | تغییر | مرحله‌هایی که دوباره اجرا می‌شوند |
-|---|---|
+| --- | --- |
 | هیچ | هیچ |
 | `eval.threshold` | `evaluate` |
 | `train.C` | `train` و `evaluate` |
@@ -305,7 +307,7 @@ Stage 'evaluate' didn't change, skipping
 
 ## گام ۴ — آزمایش‌ها (۲۰ دقیقه)
 
-`dvc exp run` یک پارامتر را موقتاً عوض می‌کند، پایپ‌لاین را اجرا می‌کند و نتیجه را بدون commit ثبت می‌کند.
+<bdi dir="rtl">`dvc exp run` یک پارامتر را موقتاً عوض می‌کند، پایپ‌لاین را اجرا می‌کند و نتیجه را بدون commit ثبت می‌کند.</bdi>
 
 > **دام مهم:** نتیجه‌ی هر آزمایش در پوشه‌ی کار اعمال می‌شود، و آزمایش بعدی از **همان وضعیت** شروع می‌کند، نه از commit. اگر بعد از هر آزمایش به حالت commit‌شده برنگردید، پارامترها روی هم انباشته می‌شوند. بعد از هر آزمایش این دو دستور را بزنید:
 
@@ -334,7 +336,7 @@ Ran experiment(s): blown-pith
 Experiment results have been applied to your workspace.
 ```
 
-`preprocess` رد شد، چون به `train.C` ربطی ندارد. به حالت اول برگردید:
+<bdi dir="rtl">`preprocess` رد شد، چون به `train.C` ربطی ندارد. به حالت اول برگردید:</bdi>
 
 ```bash
 git restore params.yaml dvc.lock metrics.json && uv run dvc checkout
@@ -400,8 +402,8 @@ uv run dvc exp show --no-pager --only-changed --md --drop '^data/|^models/|^src/
 
 سه چیز را از جدول بخوانید:
 
-- `train.C` از ۰٫۰۱ تا ۱۰ تقریباً `roc_auc` را عوض نکرد (۰٫۷۴۸۹ تا ۰٫۷۴۹۳). مدل به این پارامتر حساس نیست.
-- `f1` با آستانه‌ی ۰٫۴ از ۰٫۶۹۹۱ به ۰٫۷۳۱۹ رفت، ولی `roc_auc` ثابت ماند. آستانه مدل را بهتر نکرد؛ فقط نقطه‌ی کار را جابه‌جا کرد.
+- <bdi dir="rtl">`train.C` از ۰٫۰۱ تا ۱۰ تقریباً `roc_auc` را عوض نکرد (۰٫۷۴۸۹ تا ۰٫۷۴۹۳). مدل به این پارامتر حساس نیست.</bdi>
+- <bdi dir="rtl">`f1` با آستانه‌ی ۰٫۴ از ۰٫۶۹۹۱ به ۰٫۷۳۱۹ رفت، ولی `roc_auc` ثابت ماند. آستانه مدل را بهتر نکرد؛ فقط نقطه‌ی کار را جابه‌جا کرد.</bdi>
 - آزمایش `data.test_size=0.3` عدد `roc_auc` پایین‌تری دارد (۰٫۷۳۷۳)، اما با بقیه **قابل مقایسه نیست**: داده‌ی test عوض شده است.
 
 یکی از آزمایش‌ها را به پوشه‌ی کار بیاورید. نام آزمایش `train.C=0.1` را از ستون Experiment جدول خودتان بردارید (به‌جای `NAME`):
@@ -512,7 +514,7 @@ s05: 6/6 checks passed
 ## عیب‌یابی
 
 | نشانه | علت | راه‌حل |
-|---|---|---|
+| --- | --- | --- |
 | `ERROR: failed to reproduce 'train': failed to run: uv run python -m churn.train, exited with 1` | خود دستور مرحله خطا داده؛ علت در Traceback **بالای** این خط است | Traceback را بخوانید، کد یا پارامتر را درست کنید، دوباره `uv run dvc repro` |
 | `TypeError: build_model() got an unexpected keyword argument 'max_itr'` | غلط املایی در کلید زیر `train:` در `params.yaml` | کلیدها باید دقیقاً `C` و `max_iter` باشند |
 | `ModuleNotFoundError: No module named 'joblibb'` یا `No module named churn.evaluate` | غلط املایی در import، یا فایل مرحله به `src/churn/` کپی نشده | `ls src/churn` را ببینید؛ گام ۱ را دوباره بزنید |
@@ -529,4 +531,6 @@ s05: 6/6 checks passed
 | `Could not connect to the endpoint URL` یا `Forbidden (403)` هنگام `dvc push` | SeaweedFS خاموش است، یا کلیدها در `.dvc/config.local` نیست | همان راه‌حل‌های عیب‌یابی جلسه‌ی ۴ |
 | `ruff format --check` فایل‌ها را رد می‌کند | قالب فایل کپی‌شده با تنظیمات شما فرق دارد | `uv run ruff format .` |
 
-`dvc repro --force` همه‌ی مرحله‌ها را بی‌شرط اجرا می‌کند و فقط برای عیب‌یابی است؛ جای اصلاح `deps` را نمی‌گیرد.
+<bdi dir="rtl">`dvc repro --force` همه‌ی مرحله‌ها را بی‌شرط اجرا می‌کند و فقط برای عیب‌یابی است؛ جای اصلاح `deps` را نمی‌گیرد.</bdi>
+
+</div>

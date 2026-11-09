@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # تکلیف جلسه‌ی ۶
 
 مهلت: پیش از شروع جلسه‌ی ۷. همه‌ی کارها روی یک شاخه‌ی تازه و با یک Pull Request وارد `main` شوند.
@@ -19,7 +21,7 @@ set -a; source .env; set +a
 - هر دو باید در `metrics.json` بنویسند و به‌صورت metric در MLflow ثبت شوند (نیازی به تغییر `log_run` نیست؛ ببینید چرا).
 - با آستانه‌ی `eval.threshold` حساب شوند، مثل `f1`.
 - آزمون `test_evaluate_returns_metric_keys` در `tests/test_pipeline.py` را با کلیدهای تازه به‌روز کنید.
-- `ruff` و `pytest` سبز بمانند.
+- <bdi dir="rtl">`ruff` و `pytest` سبز بمانند.</bdi>
 
 ```bash
 uv run ruff check . && uv run ruff format --check . && uv run pytest -q
@@ -55,11 +57,11 @@ make runs
 بخشی به نام `MLflow` به `README.md` پروژه اضافه کنید:
 
 | run (نام در MLflow) | مقدار پارامتر | roc_auc | f1 | precision | recall |
-|---|---|---|---|---|---|
-| (پایه) | | | | | |
-| | | | | | |
-| | | | | | |
-| | | | | | |
+| --- | --- | --- | --- | --- | --- |
+| (پایه) |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
 
 زیر جدول در سه یا چهار جمله بنویسید: کدام run را بهتر می‌دانید و چرا (فقط به یک metric تکیه نکنید)؛ و اینکه کدام فایل‌ها برای هر run روی `s3://mlflow` ذخیره شده‌اند.
 
@@ -93,3 +95,5 @@ git switch main && git pull && uv run dvc checkout
 3. جدول بخش `MLflow` و جملات زیر آن
 4. خروجی اسکریپت `predict_from_mlflow.py`
 5. یک جمله: چرا بعضی اجراهای `dvc repro` یا `dvc exp run` run تازه‌ای در MLflow نساختند؟
+
+</div>

@@ -1,4 +1,6 @@
-# MLOps Fundamentals On-Prem — مخزن دانشجو
+<div dir="rtl">
+
+# <bdi dir="rtl">MLOps Fundamentals On-Prem — مخزن دانشجو</bdi>
 
 فایل‌های آزمایشگاه و منابع دوره‌ی **MLOps Fundamentals On-Prem** (۱۴ جلسه‌ی ۳ ساعته) — Anisa / Iran Linux House
 
@@ -23,7 +25,7 @@ git -C ~/mlops-lab pull
 ## ساختار مخزن
 
 | مسیر | محتوا |
-|---|---|
+| --- | --- |
 | `s01/`، `s02/`، … | فایل‌های آماده و راهنمای آزمایشگاه هر جلسه؛ در هر پوشه `preflight.sh` آمادگی پیش از کلاس را می‌سنجد (لپ‌تاپ و وضعیت پروژه در پایان جلسه‌ی قبل)، مثلاً `~/mlops-lab/s05/preflight.sh` |
 | `compose/` | سرویس‌های آزمایشگاه با Docker Compose: Gitea (و runner آن)، SeaweedFS، MLflow |
 | `scripts/` | `verify.sh` (بررسی پایان کار هر جلسه)، `preflight.sh` (بررسی آمادگی لپ‌تاپ؛ مثلاً `preflight.sh s03` فقط نیازهای جلسه‌ی ۳ و جلسه‌های قبل از آن را می‌سنجد)، `kind-up.sh`، `install-from-bundle.sh` |
@@ -38,7 +40,7 @@ git -C ~/mlops-lab pull
 ## جلسه‌ها
 
 | جلسه | موضوع | پوشه |
-|---|---|---|
+| --- | --- | --- |
 | ۱ | شروع دوره و مبانی MLOps؛ اولین مدل Churn | [`s01/`](s01/README.md) |
 | ۲ | Git برای ML و کیفیت کد | [`s02/`](s02/README.md) · [آماده‌سازی](s02/SETUP.md) |
 | ۳ | مبانی Docker و ذخیره‌ساز شیء (SeaweedFS) | [`s03/`](s03/README.md) · [تکلیف](s03/HOMEWORK.md) |
@@ -57,3 +59,5 @@ git -C ~/mlops-lab pull
 ## درباره‌ی کلیدهای داخل `compose/`
 
 کلیدهای `compose/.env.example` و `compose/seaweedfs/s3.json` فقط برای سرویس‌های محلی آزمایشگاه روی لپ‌تاپ خودتان هستند. هرگز آن‌ها را بیرون از کلاس استفاده نکنید.
+
+</div>

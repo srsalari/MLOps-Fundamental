@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # تکلیف جلسه‌ی ۴
 
 مهلت: پیش از شروع جلسه‌ی ۵. این تکلیف چهار بخش دارد. بخش‌های ۱، ۳ و ۴ روی یک شاخه و با یک Pull Request وارد `main` می‌شوند. بخش ۲ (نسخه‌ی ۳ داده) روی شاخه‌ی جدا می‌ماند و **merge نمی‌شود**، چون جلسه‌ی ۵ دقیقاً از داده‌ی نسخه‌ی ۲ روی `main` شروع می‌کند (متریک `0.7493` و `0.6991`).
@@ -10,7 +12,7 @@ cd ~/work/churn-mlops && git switch main && git pull && git switch -c feature/ho
 set -a; source .env; set +a
 ```
 
-SeaweedFS باید روشن باشد (`docker compose ps` در پوشه‌ی `~/mlops-lab/compose`). فایل‌ها را با VS Code یا `nano` ویرایش کنید. دانشجوهای Windows همه‌ی دستورها را داخل WSL Ubuntu اجرا کنند.
+<bdi dir="rtl">SeaweedFS باید روشن باشد (`docker compose ps` در پوشه‌ی `~/mlops-lab/compose`). فایل‌ها را با VS Code یا `nano` ویرایش کنید. دانشجوهای Windows همه‌ی دستورها را داخل WSL Ubuntu اجرا کنند.</bdi>
 
 ## ۱. بخش «Data versioning» در README
 
@@ -49,7 +51,7 @@ git switch feature/homework-4 && uv run dvc checkout
 دو هدف به `Makefile` اضافه کنید و نامشان را به خط `.PHONY` هم بیفزایید (خط‌های دستور با **TAB** شروع می‌شوند، نه فاصله):
 
 | هدف | کار |
-|---|---|
+| --- | --- |
 | `data-pull` | داده را از remote می‌گیرد (دستور `dvc pull`) |
 | `data-status` | وضعیت cache در برابر remote را نشان می‌دهد (دستور `dvc status` با گزینه‌ی cloud) |
 
@@ -96,3 +98,5 @@ git switch main && git pull
 3. خروجی `git tag -n1`
 4. لینک شاخه‌ی `feature/data-v3` در Gitea
 5. یک جمله: اگر `churn.csv.dvc` در Git باشد ولی `dvc push` را هرگز نزده باشید، همکار شما بعد از clone و `dvc pull` چه می‌بیند و چرا؟
+
+</div>

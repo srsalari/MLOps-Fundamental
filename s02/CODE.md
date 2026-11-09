@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # توضیح کد جلسه‌ی ۲
 
 در این جلسه چهار فایل به پروژه اضافه می‌شود: `test_data.py` و `test_train.py` (آزمون‌های خودکار با pytest)، `pyproject-snippet.toml` (تنظیمات ruff و pytest) و `.pre-commit-config.yaml` (hookهایی که قبل از commit و push اجرا می‌شوند). کامنت‌های داخل فایل‌ها انگلیسی‌اند تا ویرایشگر کد درست نشان بدهد؛ توضیح فارسی کامل اینجاست.
@@ -188,3 +190,5 @@ uv run pre-commit run --all-files
 - اگر در تابع `make` از `seed` استفاده نمی‌کردیم، کدام تست `test_data.py` گاهی یا همیشه fail می‌شد؟
 - چرا hook مربوط به pytest روی `pre-push` است و نه `pre-commit`؟
 - یک نمونه از متنی بنویسید که hook `no-secrets` آن را بگیرد و یک نمونه که نگیرد.
+
+</div>

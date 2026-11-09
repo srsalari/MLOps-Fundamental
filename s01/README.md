@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # آزمایشگاه جلسه‌ی ۱ — اولین مدل Churn
 
 در این آزمایشگاه یک پروژه‌ی ML مرتب می‌سازید، داده‌ی مصنوعی تولید می‌کنید و اولین مدل (خط پایه) را آموزش می‌دهید.
@@ -15,7 +17,7 @@
 ## فایل‌های این پوشه
 
 | فایل | مقصد در پروژه | کار |
-|---|---|---|
+| --- | --- | --- |
 | `make_dataset.py` | `scripts/` | ساخت داده‌ی مصنوعی مشتری‌ها |
 | `train.py` | `src/churn/` | آموزش و ارزیابی مدل |
 | `params.yaml` | `configs/` | تنظیمات (hyperparameterها) |
@@ -26,8 +28,8 @@
 
 ## پیش‌نیازها
 
-- `git`
-- `make`
+- <bdi dir="rtl">`git`</bdi>
+- <bdi dir="rtl">`make`</bdi>
 - [`uv`](https://docs.astral.sh/uv/) (پایتون ۳٫۱۲ را خودش نصب می‌کند)
 - اینترنت، برای دریافت کتابخانه‌ها در گام ۲
 
@@ -39,7 +41,7 @@ git --version && make --version | head -1 && uv --version
 
 ### macOS
 
-`git` و `make` با Xcode Command Line Tools می‌آیند:
+<bdi dir="rtl">`git` و `make` با Xcode Command Line Tools می‌آیند:</bdi>
 
 ```bash
 xcode-select --install
@@ -160,8 +162,8 @@ make train
 {'roc_auc': 0.802, 'f1': 0.5969}
 ```
 
-- **ROC-AUC:** توان مدل در جدا کردن مشتری رفته از مشتری مانده. عدد ۰٫۵ یعنی شانسی و ۱ یعنی بی‌نقص.
-- **F1:** ترکیب دقت و پوشش پیش‌بینی‌های «می‌رود».
+- <bdi dir="rtl">**ROC-AUC:** توان مدل در جدا کردن مشتری رفته از مشتری مانده. عدد ۰٫۵ یعنی شانسی و ۱ یعنی بی‌نقص.</bdi>
+- <bdi dir="rtl">**F1:** ترکیب دقت و پوشش پیش‌بینی‌های «می‌رود».</bdi>
 
 ### گام ۶ — آزمون تکرارپذیری و commit
 
@@ -186,7 +188,7 @@ git add . && git commit -m "feat: project skeleton + baseline training"
 git status --short && git log --oneline
 ```
 
-`git status` باید خالی باشد و `git log` یک commit نشان دهد.
+<bdi dir="rtl">`git status` باید خالی باشد و `git log` یک commit نشان دهد.</bdi>
 
 ## بررسی پایان کار
 
@@ -215,7 +217,7 @@ churn-mlops/
 ## عیب‌یابی
 
 | نشانه | علت | راه‌حل |
-|---|---|---|
+| --- | --- | --- |
 | `The token '&&' is not a valid statement separator` | دستور Linux در PowerShell اجرا شده | پنجره‌ی Ubuntu را باز کنید (`wsl`) و دستور را آن‌جا اجرا کنید |
 | `command not found: uv` | ترمینال پس از نصب دوباره باز نشده | ترمینال را ببندید و باز کنید |
 | `command not found: make` | `make` نصب نیست | بخش پیش‌نیازها را ببینید |
@@ -230,5 +232,7 @@ churn-mlops/
 در `train.py` آستانه‌ی تصمیم داخل کد نوشته شده است (`proba > 0.5`).
 
 1. آن را به `configs/params.yaml` ببرید و کد را طوری تغییر دهید که از آن‌جا بخواند.
-2. `make train` را اجرا کنید؛ عددها نباید تغییر کنند.
+2. <bdi dir="rtl">`make train` را اجرا کنید؛ عددها نباید تغییر کنند.</bdi>
 3. آستانه را ۰٫۳ کنید. کدام عدد عوض می‌شود و کدام نه؟ چرا؟
+
+</div>
