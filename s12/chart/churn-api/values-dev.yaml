@@ -1,0 +1,16 @@
+# Development: one copy, follows the @champion alias, small limits.
+replicaCount: 1
+
+config:
+  modelUri: models:/churn@champion
+
+ingress:
+  host: churn.localhost
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 192Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

@@ -1,0 +1,58 @@
+# Session 13: ML-aware CI. On every pull request: retrain with DVC, compare the metrics with
+# main, and write the table as a comment on the pull request.
+name: ml-ci
+
+on:
+  pull_request:
+    paths:
+      - "params.yaml"
+      - "dvc.yaml"
+      - "src/**"
+      - "data/**"
+      - ".gitea/workflows/ml-ci.yaml"
+
+env:
+  GITEA_INTERNAL: http://gitea:3000
+  UV_LINK_MODE: copy
+  MLFLOW_DISABLE_AGENT_HINT: "1"
+  # CI trains into a throw-away local MLflow database: it must not fill the real server.
+  MLFLOW_TRACKING_URI: sqlite:///ci-mlflow.db
+  # DVC reads the S3 keys from these standard variables. They are repository secrets.
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-east-1
+
+jobs:
+  metrics-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout (the PR code and the main branch for the comparison)
+        run: |
+          git init -q .
+          git remote add origin "http://ci:${{ secrets.GITHUB_TOKEN }}@gitea:3000/${{ github.repository }}.git"
+          git fetch -q origin main:refs/remotes/origin/main "${{ github.sha }}"
+          git checkout -q "${{ github.sha }}"
+          git log --oneline -1
+
+      - name: install dependencies
+        run: uv sync --frozen
+
+      - name: point DVC at the S3 server inside the Docker network
+        run: uv run dvc remote modify --local storage endpointurl http://seaweedfs:8333
+
+      - name: pull the data
+        run: uv run dvc pull data/raw/churn.csv.dvc
+
+      - name: retrain (dvc repro)
+        run: uv run dvc repro
+
+      - name: compare the metrics with main
+        run: |
+          uv run dvc metrics diff origin/main --all --md | tee metrics-diff.md
+
+      - name: comment on the pull request
+        env:
+          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: uv run python scripts/pr_comment.py metrics-diff.md

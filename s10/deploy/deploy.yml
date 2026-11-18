@@ -1,0 +1,138 @@
+# Session 10: deploy the churn API to the VM with systemd + Nginx.
+# Run:      uv run ansible-playbook deploy.yml                      (from the deploy/ folder)
+# Rollback: uv run ansible-playbook deploy.yml -e model_uri=models:/churn/1
+- name: Deploy the churn API
+  hosts: api
+  become: true
+  vars:
+    app_dir: /opt/churn-api
+    api_port: 8000
+    mlflow_uri: http://mlflow:5000
+    model_uri: models:/churn@champion
+    wheel: "{{ lookup('ansible.builtin.fileglob', '../dist/churn-*.whl', wantlist=True) | first }}"
+
+  tasks:
+    - name: Packages are installed
+      ansible.builtin.apt:
+        name: [python3-venv, nginx, logrotate]
+        state: present
+
+    - name: Service user exists (no login shell)
+      ansible.builtin.user:
+        name: churn
+        system: true
+        shell: /usr/sbin/nologin
+        create_home: false
+
+    - name: Folders exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: churn
+        group: churn
+        mode: "0755"
+      loop: ["{{ app_dir }}", /var/log/churn-api, /etc/churn-api]
+
+    - name: Requirements file is copied
+      ansible.builtin.copy:
+        src: requirements.txt
+        dest: "{{ app_dir }}/requirements.txt"
+        mode: "0644"
+
+    - name: Libraries are installed in the virtual environment
+      ansible.builtin.pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        virtualenv: "{{ app_dir }}/venv"
+        virtualenv_command: python3 -m venv
+
+    - name: App wheel is copied
+      ansible.builtin.copy:
+        src: "{{ wheel }}"
+        dest: "{{ app_dir }}/{{ wheel | basename }}"
+        mode: "0644"
+      register: wheel_copy
+
+    - name: Our app is installed from the wheel (only when the wheel changed)
+      ansible.builtin.pip:
+        name: "{{ app_dir }}/{{ wheel | basename }}"
+        virtualenv: "{{ app_dir }}/venv"
+        extra_args: --no-deps --force-reinstall
+      when: wheel_copy.changed
+      notify: Restart churn-api
+
+    - name: Settings file (model, MLflow address)
+      ansible.builtin.template:
+        src: templates/churn-api.env.j2
+        dest: /etc/churn-api/churn-api.env
+        owner: root
+        group: churn
+        mode: "0640"
+      notify: Restart churn-api
+
+    - name: systemd unit
+      ansible.builtin.template:
+        src: templates/churn-api.service.j2
+        dest: /etc/systemd/system/churn-api.service
+        mode: "0644"
+      notify: Restart churn-api
+
+    - name: Log rotation for the API log
+      ansible.builtin.template:
+        src: templates/churn-api.logrotate.j2
+        dest: /etc/logrotate.d/churn-api
+        mode: "0644"
+
+    - name: Nginx site (reverse proxy on port 80)
+      ansible.builtin.template:
+        src: templates/nginx-churn-api.conf.j2
+        dest: /etc/nginx/sites-available/churn-api
+        mode: "0644"
+      notify: Reload nginx
+
+    - name: Nginx site is enabled, the default site is not
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/churn-api
+        dest: /etc/nginx/sites-enabled/churn-api
+        state: link
+      notify: Reload nginx
+
+    - name: Default Nginx site is removed
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reload nginx
+
+    - name: Services are enabled and running
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+        daemon_reload: true
+      loop: [churn-api, nginx]
+
+  handlers:
+    - name: Restart churn-api
+      ansible.builtin.systemd_service:
+        name: churn-api
+        state: restarted
+        daemon_reload: true
+
+    - name: Reload nginx
+      ansible.builtin.systemd_service:
+        name: nginx
+        state: reloaded
+
+  post_tasks:
+    - name: The API is ready behind Nginx
+      ansible.builtin.uri:
+        url: http://127.0.0.1/ready
+        return_content: true
+      register: ready
+      retries: 20
+      delay: 3
+      until: ready.status == 200
+
+    - name: Show the served model version
+      ansible.builtin.debug:
+        msg: "ready: {{ ready.json }}"
+      when: not ansible_check_mode   # --check does not call the API

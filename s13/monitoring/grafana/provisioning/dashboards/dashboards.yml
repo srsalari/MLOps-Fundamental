@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: lab
+    type: file
+    allowUiUpdates: true         # you may edit a panel in the UI; "Save" does not write the file
+    options:
+      path: /var/lib/grafana/dashboards

@@ -1,0 +1,15 @@
+# Alert rules. Prometheus checks them every evaluation_interval; the state
+# (inactive, pending, firing) is visible at http://localhost:9090/alerts.
+# There is no Alertmanager in this lab, so nothing is sent: a firing alert is only shown.
+groups:
+  - name: churn-api
+    rules:
+      # Example from the class: the API cannot be scraped for 15 seconds.
+      - alert: ChurnApiDown
+        expr: up{job="churn-api"} == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: "churn-api does not answer /metrics"
+      # HOMEWORK: add ONE more rule here (for example a high error rate) and test it.

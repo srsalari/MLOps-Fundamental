@@ -1,0 +1,47 @@
+# Session 13: the basic CI pipeline. lint -> test -> build -> scan -> push.
+# It runs the SAME make targets you run on your laptop, inside the CI job image.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  # The job container reaches Gitea by its compose service name, not by localhost.
+  GITEA_INTERNAL: http://gitea:3000
+  UV_LINK_MODE: copy
+  MLFLOW_DISABLE_AGENT_HINT: "1"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      # No "uses: actions/checkout": it would download from the internet. Plain git works offline.
+      - name: checkout
+        run: |
+          git init -q .
+          git remote add origin "http://ci:${{ secrets.GITHUB_TOKEN }}@gitea:3000/${{ github.repository }}.git"
+          git fetch -q --depth=1 origin "${{ github.sha }}"
+          git checkout -q FETCH_HEAD
+          git log --oneline -1
+
+      - name: install dependencies
+        run: uv sync --frozen
+
+      - name: lint
+        run: make lint
+
+      - name: test
+        run: make test
+
+      - name: build image
+        run: make image TAG=ci-${GITHUB_SHA::7}
+
+      - name: scan image (Trivy)
+        run: make scan TAG=ci-${GITHUB_SHA::7}
+
+      # Only code that is merged into main is pushed to the registry.
+      - name: push image
+        if: github.ref == 'refs/heads/main'
+        run: make push TAG=ci-${GITHUB_SHA::7}

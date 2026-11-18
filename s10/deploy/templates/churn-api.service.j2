@@ -1,0 +1,19 @@
+# Managed by Ansible.
+[Unit]
+Description=Churn prediction API (uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=churn
+Group=churn
+WorkingDirectory={{ app_dir }}
+EnvironmentFile=/etc/churn-api/churn-api.env
+ExecStart={{ app_dir }}/venv/bin/uvicorn churn.api:app --host 127.0.0.1 --port {{ api_port }} --no-access-log
+StandardOutput=append:/var/log/churn-api/api.log
+StandardError=append:/var/log/churn-api/api.log
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

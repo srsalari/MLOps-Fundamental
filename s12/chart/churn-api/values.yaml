@@ -1,0 +1,37 @@
+# Default values. Every environment starts from this file; values-dev.yaml and
+# values-prod.yaml (or --set) override only what is different.
+
+# How many copies (pods) of the API run.
+replicaCount: 2
+
+image:
+  repository: localhost:5001/churn-api
+  # Empty = use appVersion from Chart.yaml (0.7.0).
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# Settings of the API. They become the ConfigMap and the environment of the pods.
+config:
+  # MLflow inside the Docker network "mlops-lab" (the kind node is connected to it).
+  mlflowTrackingUri: http://mlflow:5000
+  # Which model to serve; models:/churn/1 pins a version.
+  modelUri: models:/churn@champion
+  predictThreshold: "0.5"
+
+service:
+  port: 80
+
+# Host-based routing with Traefik. *.localhost points to your laptop without /etc/hosts.
+ingress:
+  enabled: true
+  className: traefik
+  host: churn.localhost
+  path: /
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

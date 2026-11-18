@@ -1,0 +1,13 @@
+Release {{ .Release.Name }} (revision {{ .Release.Revision }}) of {{ .Chart.Name }}-{{ .Chart.Version }} is installed in namespace {{ .Release.Namespace }}.
+
+Model:    {{ .Values.config.modelUri }}
+Image:    {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+Replicas: {{ .Values.replicaCount }}
+{{- if .Values.ingress.enabled }}
+
+Try it (the host name resolves to your laptop; 8080 is the Traefik port):
+  curl http://{{ .Values.ingress.host }}:8080/ready
+{{- end }}
+
+Watch the rollout:
+  kubectl --context <your-context> -n {{ .Release.Namespace }} rollout status deployment/{{ include "churn-api.fullname" . }}

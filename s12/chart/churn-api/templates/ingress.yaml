@@ -1,0 +1,22 @@
+{{- if .Values.ingress.enabled }}
+# Host-based routing: requests for this host name go to the Service.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "churn-api.fullname" . }}
+  labels:
+    {{- include "churn-api.labels" . | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "churn-api.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}

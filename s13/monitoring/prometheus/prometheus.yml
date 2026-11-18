@@ -1,0 +1,18 @@
+# Prometheus settings for session 13.
+global:
+  scrape_interval: 5s        # how often Prometheus reads /metrics (15s is normal; 5s is for the class)
+  evaluation_interval: 5s    # how often the alert rules are checked
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: churn-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["churn-api-mon:8000"]     # the compose service name + the container port
+        labels:
+          service: churn-api
+  - job_name: prometheus                    # Prometheus watches itself too
+    static_configs:
+      - targets: ["localhost:9090"]

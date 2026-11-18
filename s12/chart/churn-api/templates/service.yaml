@@ -1,0 +1,14 @@
+# One stable name and port in front of the pods (only ready pods get traffic).
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "churn-api.fullname" . }}
+  labels:
+    {{- include "churn-api.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "churn-api.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http

@@ -1,0 +1,12 @@
+# Session 11: settings of the API as environment variables (not secret).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: churn-api-config
+  namespace: churn
+data:
+  # MLflow inside the Docker network "mlops-lab" (the kind node is connected to it).
+  MLFLOW_TRACKING_URI: http://mlflow:5000
+  # Which model to serve; models:/churn/1 pins a version.
+  MODEL_URI: models:/churn@champion
+  PREDICT_THRESHOLD: "0.5"

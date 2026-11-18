@@ -1,0 +1,11 @@
+# Settings of the API as environment variables (not secret).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "churn-api.fullname" . }}-config
+  labels:
+    {{- include "churn-api.labels" . | nindent 4 }}
+data:
+  MLFLOW_TRACKING_URI: {{ .Values.config.mlflowTrackingUri | quote }}
+  MODEL_URI: {{ .Values.config.modelUri | quote }}
+  PREDICT_THRESHOLD: {{ .Values.config.predictThreshold | quote }}

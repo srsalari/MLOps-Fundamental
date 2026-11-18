@@ -1,0 +1,60 @@
+# Session 11: run 2 copies (pods) of the API image from the local registry.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-api
+  namespace: churn
+  labels:
+    app: churn-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: churn-api
+  # Replace pods one by one; never go below 2 ready pods during a rollout.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: churn-api
+    spec:
+      securityContext:
+        # The image runs as user app (uid 10001); Kubernetes needs the number to check it.
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: api
+          image: localhost:5001/churn-api:0.7.0
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: churn-api-config
+          # Ready = the model is loaded (503 until then): no traffic before that.
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          # Alive = the process answers; 3 failures in a row -> restart the container.
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

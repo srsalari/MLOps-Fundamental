@@ -1,0 +1,5 @@
+# Session 11: everything of the churn service lives in its own namespace.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: churn

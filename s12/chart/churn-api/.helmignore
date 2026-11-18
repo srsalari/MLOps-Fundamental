@@ -1,0 +1,5 @@
+# Files that are not part of the chart package (helm package skips them).
+.git/
+.DS_Store
+*.swp
+*.bak

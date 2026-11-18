@@ -1,0 +1,47 @@
+# Session 13: scheduled retrain. Every Monday at 03:00 (and on demand) it retrains with the
+# latest data and registers the result as @challenger. A person runs `make promote` later:
+# the gate decides, and a machine never moves @champion by itself.
+name: retrain
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+env:
+  UV_LINK_MODE: copy
+  MLFLOW_DISABLE_AGENT_HINT: "1"
+  # This time the run is logged on the REAL MLflow server (the compose service "mlflow").
+  MLFLOW_TRACKING_URI: http://mlflow:5000
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-east-1
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout main
+        run: |
+          git init -q .
+          git remote add origin "http://ci:${{ secrets.GITHUB_TOKEN }}@gitea:3000/${{ github.repository }}.git"
+          git fetch -q --depth=1 origin main
+          git checkout -q FETCH_HEAD
+
+      - name: install dependencies
+        run: uv sync --frozen
+
+      - name: pull the data
+        run: |
+          uv run dvc remote modify --local storage endpointurl http://seaweedfs:8333
+          uv run dvc pull data/raw/churn.csv.dvc
+
+      - name: retrain and log the run to MLflow
+        run: uv run dvc repro --force
+
+      - name: register the new model as @challenger
+        run: |
+          RUN=$(uv run python scripts/list_runs.py | awk 'NR==2 {print $1}')
+          echo "newest run: $RUN"
+          uv run python -m churn.registry register --run "$RUN"
+          uv run python -m churn.registry show

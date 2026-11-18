@@ -1,0 +1,60 @@
+# Session 13: monitoring stack next to the API: Prometheus + Grafana + one API container.
+# Start:  docker compose up -d        Stop:  docker compose down   (never -v in class)
+#   Prometheus  http://localhost:9090
+#   Grafana     http://localhost:3001   (user admin, password mlops-lab: LAB ONLY)
+#   API         http://localhost:8003   (/predict, /metrics)
+name: mlops-monitoring
+
+services:
+  # The churn API from session 9 (image churn-api:0.7.0), started here so Prometheus can
+  # reach it by name. It joins the lab network to reach MLflow at http://mlflow:5000.
+  churn-api-mon:
+    image: churn-api:${API_TAG:-0.7.0}
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      # `make api-break` starts it with a model that does not exist: every /predict gives 503.
+      MODEL_URI: ${MODEL_URI:-models:/churn@champion}
+    ports:
+      - "127.0.0.1:${API_PORT:-8003}:8000"
+    restart: unless-stopped
+
+  prometheus:
+    image: ${PROMETHEUS_IMAGE:-prom/prometheus:v3.13.4}
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=2d
+      - --web.enable-lifecycle       # lets us reload the config with an HTTP POST
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: ${GRAFANA_IMAGE:-grafana/grafana:13.0.12}
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: mlops-lab          # LAB ONLY
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"        # no calls to the internet
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3001}:3000"
+    depends_on: [prometheus]
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+# Join the network that the lab services (mlflow, gitea, ...) already use.
+networks:
+  default:
+    name: ${LAB_NETWORK:-mlops-lab}
+    external: true

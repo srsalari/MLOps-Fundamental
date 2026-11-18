@@ -1,0 +1,9 @@
+# Production: three copies, a PINNED model version (a new @champion never changes
+# production by surprise), its own host name.
+replicaCount: 3
+
+config:
+  modelUri: models:/churn/2
+
+ingress:
+  host: prod.churn.localhost

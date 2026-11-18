@@ -1,0 +1,9 @@
+# Session 12: the Helm chart of the churn API (the S11 manifests, turned into templates).
+apiVersion: v2
+name: churn-api
+description: Churn prediction API (FastAPI) - Deployment, Service, ConfigMap and Ingress
+type: application
+# version = the version of the CHART (the packaging). Change it when a template changes.
+version: 0.1.0
+# appVersion = the version of the APP inside (the image tag). It is the default image tag.
+appVersion: "0.7.0"

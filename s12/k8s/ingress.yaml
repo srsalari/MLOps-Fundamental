@@ -1,0 +1,19 @@
+# Session 12: host-based routing. Traefik sends requests for churn.localhost to the Service.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: churn-api
+  namespace: churn
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: churn.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: churn-api
+                port:
+                  number: 80

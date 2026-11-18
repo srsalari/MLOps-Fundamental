@@ -1,0 +1,13 @@
+# Session 11: one stable name and port in front of the pods (only ready pods get traffic).
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-api
+  namespace: churn
+spec:
+  selector:
+    app: churn-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
